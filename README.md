@@ -51,4 +51,9 @@ $notifier->run();
 
 ## Handlers
 
-Currently there only is a Slack notifier, feel free to create your own by extending the ```Handler``` class
+Currently there are only two handlers:
+
+* Slack
+* Redis (So you can query Redis and display the pokemon on a map)
+
+Feel free to create your own by extending the ```Handler``` class
