@@ -1,5 +1,10 @@
 # Pokemon Go Notifier PHP CLI App
 
+## Requirements
+
+* PHP 7
+* cURL extension
+
 ## Example
 Check out the ```examples/slack.php``` file. Don't forget to set your configuration.
 
