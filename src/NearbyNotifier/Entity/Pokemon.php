@@ -4,6 +4,7 @@ namespace NearbyNotifier\Entity;
 use POGOProtos\Enums\PokemonId;
 use DateTime;
 use DateInterval;
+use JsonSerializable;
 
 /**
  * Class Pokemon
@@ -11,7 +12,7 @@ use DateInterval;
  * @package NearbyNotifier\Entity
  * @author Freek Post <freek.post@onecube.nl>
  */
-class Pokemon
+class Pokemon implements JsonSerializable
 {
     /**
      * @var int
@@ -156,5 +157,23 @@ class Pokemon
     public function isNewEncounter() : bool
     {
         return $this->newEncounter;
+    }
+
+    /**
+     * To array
+     *
+     * @return array
+     */
+    function jsonSerialize()
+    {
+        return [
+            'encounterId' => $this->getEncounterId(),
+            'pokemonId' => $this->getPokemonId(),
+            'name' => $this->getName(),
+            'latitude' => $this->getLatitude(),
+            'longitude' => $this->getLongitude(),
+            'expiresAt' => $this->getExpiry()->getTimestamp(),
+            'new' => $this->isNewEncounter()
+        ];
     }
 }

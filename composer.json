@@ -7,12 +7,14 @@
         }
     ],
     "minimum-stability": "dev",
+    "prefer-stable" : true,
     "require": {
         "php": ">=7.0.0",
         "ext-curl": "*",
         "maknz/slack": "^1.7",
         "sjaakmoes/pokapi": "dev-master",
-        "monolog/monolog": "^1.21"
+        "monolog/monolog": "^1.21",
+        "predis/predis": "^1.1"
     },
     "repositories": [
         {
