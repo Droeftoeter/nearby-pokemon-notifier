@@ -1,0 +1,26 @@
+{
+    "name": "sjaakmoes/nearby-pokemon-notifier",
+    "authors": [
+        {
+            "name": "Freek Post",
+            "email": "freek@kobalt.blue"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "maknz/slack": "^1.7",
+        "sjaakmoes/pokapi": "dev-master",
+        "monolog/monolog": "^1.21"
+    },
+    "repositories": [
+        {
+            "url": "https://github.com/Sjaakmoes/pokapi.git",
+            "type": "git"
+        }
+    ],
+    "autoload": {
+        "psr-0": {
+            "NearbyNotifier\\": "src/"
+        }
+    }
+}

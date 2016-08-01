@@ -1,0 +1,1 @@
+Pokemon Go Nearby Notifier CLI app.
