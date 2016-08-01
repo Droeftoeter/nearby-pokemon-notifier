@@ -475,7 +475,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Sjaakmoes/pokapi.git",
-                "reference": "caea54ae6d3f2819be89984771d76331e5f18f8b"
+                "reference": "c487be717f530310bc644284335240c8d2cc3cb2"
             },
             "require": {
                 "guzzlehttp/guzzle": "^6.2",
@@ -499,7 +499,7 @@
                     "email": "freek@kobalt.blue"
                 }
             ],
-            "time": "2016-08-01 19:21:24"
+            "time": "2016-08-01 22:02:18"
         }
     ],
     "packages-dev": [],

@@ -111,7 +111,7 @@ class Notifier
             }
 
             $this->getLogger()->debug('Waiting {LoopInterval} seconds before restarting...', [
-                'LoopInterval' => round($this->loopInterval/1000)
+                'LoopInterval' => round($this->loopInterval/1000/1000)
             ]);
             usleep($this->loopInterval);
         }
