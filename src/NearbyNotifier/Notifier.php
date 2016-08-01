@@ -43,6 +43,16 @@ class Notifier
      */
     protected $logger;
 
+    /**
+     * @var int
+     */
+    protected $loopInterval = 60000 * 1000; // 60 seconds.
+
+    /**
+     * @var int
+     */
+    protected $stepInterval = 1000 * 1000; // 1 second.
+
     public function __construct(Provider $authProvider, float $latitude, float $longitude, int $steps = 5)
     {
         $this->api = new API($authProvider, $latitude, $longitude);
@@ -97,11 +107,13 @@ class Notifier
                         }
                     }
                 }
-                sleep(1); // Wait a second before next request.
+                usleep($this->stepInterval);
             }
 
-            $this->getLogger()->debug('Waiting 60 seconds before restarting...');
-            sleep(60); // Wait 1 minute before walking again.
+            $this->getLogger()->debug('Waiting {LoopInterval} seconds before restarting...', [
+                'LoopInterval' => round($this->loopInterval/1000)
+            ]);
+            usleep($this->loopInterval);
         }
     }
 
@@ -115,6 +127,30 @@ class Notifier
     public function setLogger(LoggerInterface $logger) : self
     {
         $this->logger = $logger;
+        return $this;
+    }
+
+    /**
+     * Set the step interval in milliseconds
+     *
+     * @param int $interval
+     * @return $this
+     */
+    public function setStepInterval(int $interval)
+    {
+        $this->stepInterval = round($interval * 1000);
+        return $this;
+    }
+
+    /**
+     * Set the loop interval in milliseconds
+     *
+     * @param int $interval
+     * @return Notifier
+     */
+    public function setLoopInterval(int $interval) : self
+    {
+        $this->loopInterval = round($interval * 1000);
         return $this;
     }
 
