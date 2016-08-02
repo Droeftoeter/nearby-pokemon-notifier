@@ -20,8 +20,8 @@ $notifier = new Notifier(
     new TrainersClub('username', 'password'),
     51.436596, // Latitude
     5.478001, // Longitude
-    5, // The amount of steps to walk
-    0.07 // The search radius
+    5, // Step amount, each step is a wider area around the previous.
+    0.07 // The scan area per request. The stepper will generate steps based on this and the amount of steps.
 );
 
 // Attach a new Slack handler
@@ -72,8 +72,8 @@ $notifier = new ForkedNotifier(
     ],
     51.436596, // Latitude
     5.478001, // Longitude
-    5, // The amount of steps to walk,
-    0.07 // The search radius. 
+    5, // Step amount, each step is a wider area around the previous.
+    0.07 // The scan area per request. The stepper will generate steps based on this and the amount of steps.
 );
 ```
 
