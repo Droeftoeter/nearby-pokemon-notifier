@@ -1,4 +1,4 @@
-# Pokemon Go Notifier PHP CLI App
+# Pokemon Go Notifier / Scanner PHP CLI App
 
 ## Requirements
 
