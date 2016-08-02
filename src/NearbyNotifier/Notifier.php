@@ -5,6 +5,7 @@ use NearbyNotifier\Handler\Handler;
 use POGOProtos\Map\Pokemon\WildPokemon;
 use Pokapi\API;
 use Pokapi\Authentication\Provider;
+use Pokapi\Exception\NoResponse;
 use Pokapi\Utility\Geo;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -150,9 +151,14 @@ class Notifier
      */
     public function init()
     {
-        $this->api->getPlayerData();
-        $this->api->getInventory();
-        $this->api->downloadSettings();
+        try {
+            $this->api->getPlayerData();
+            $this->api->getInventory();
+            $this->api->downloadSettings();
+        } catch(NoResponse $e) {
+            $this->getLogger()->debug('Failed initialization, retrying...');
+            return $this->init();
+        }
     }
 
     /**
