@@ -58,9 +58,14 @@ class ForkedNotifier extends BaseNotifier
     {
         /* Splits the workload */
         $stepChunks = array_chunk($this->steps, ceil(count($this->steps) / count($this->authProviders)));
-        $this->getLogger()->debug("Splitting workload into {Chunks} chunks.", [
+        $this->getLogger()->debug("Splitting workload of {Total} into {Chunks} chunks.", [
+            'Total'  => count($this->steps),
             'Chunks' => count($stepChunks)
         ]);
+
+        if (count($stepChunks[0]) > 100) {
+            $this->getLogger()->alert("Chunk size is more than 100. Considering adding more accounts.");
+        }
 
         /* Spawn a fork for every authentication provider */
         foreach ($stepChunks as $chunk => $steps) {
@@ -104,9 +109,6 @@ class ForkedNotifier extends BaseNotifier
     {
         $pid = pcntl_fork();
         if (!$pid) {
-            $this->getLogger()->debug("Spawning child process to walk {Steps} steps.", [
-                'Steps' => count($steps)
-            ]);
             $notifier = new Notifier($authProvider, $this->latitude, $this->longitude, 1, 0.07);
             $notifier->overrideSteps($steps);
             $notifier->setLogger($this->getLogger());
@@ -119,6 +121,11 @@ class ForkedNotifier extends BaseNotifier
             $notifier->run();
             exit;
         }
+
+        $this->getLogger()->debug("Spawned child process {PID} to walk {Steps} steps.", [
+            'Steps' => count($steps),
+            'PID' => $pid
+        ]);
 
         return $pid;
     }
