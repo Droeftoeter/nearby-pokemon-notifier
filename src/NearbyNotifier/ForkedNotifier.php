@@ -18,9 +18,9 @@ class ForkedNotifier extends BaseNotifier
     protected $authProviders;
 
     /**
-     * @var int
+     * @var int[]
      */
-    protected $pid;
+    protected $pids = [];
 
     /**
      * ForkedNotifier constructor.
@@ -64,12 +64,17 @@ class ForkedNotifier extends BaseNotifier
 
         /* Spawn a fork for every authentication provider */
         foreach ($stepChunks as $chunk => $steps) {
-            $this->fork($steps, $this->authProviders[$chunk]);
+            $this->pids[] = $this->fork($steps, $this->authProviders[$chunk]);
         }
 
-        /* If parent process */
-        if ($this->pid) {
-            pcntl_wait($status);
+        /* If parent process, wait for all children to finish */
+        foreach ($this->pids as $pid) {
+            pcntl_waitpid($pid, $status);
+            unset($this->pids[$pid]);
+
+            $this->getLogger()->debug("Child with process ID {PID} has finished.", [
+                'PID' => $pid
+            ]);
         }
     }
 
@@ -92,17 +97,20 @@ class ForkedNotifier extends BaseNotifier
      *
      * @param array $steps
      * @param Provider $authProvider
+     *
+     * @return int
      */
-    protected function fork(array $steps, Provider $authProvider)
+    protected function fork(array $steps, Provider $authProvider) : int
     {
-        $this->pid = pcntl_fork();
-        if (!$this->pid) {
+        $pid = pcntl_fork();
+        if (!$pid) {
             $this->getLogger()->debug("Spawning child process to walk {Steps} steps.", [
                 'Steps' => count($steps)
             ]);
             $notifier = new Notifier($authProvider, $this->latitude, $this->longitude, 1, 0.07);
             $notifier->overrideSteps($steps);
             $notifier->setLogger($this->getLogger());
+            $notifier->init();
 
             foreach ($this->handlers as $handler) {
                 $notifier->attach($handler);
@@ -111,5 +119,7 @@ class ForkedNotifier extends BaseNotifier
             $notifier->run();
             exit;
         }
+
+        return $pid;
     }
 }

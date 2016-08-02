@@ -137,11 +137,12 @@ class Notifier extends BaseNotifier
             );
 
             /* Log */
-            $this->getLogger()->info("{State} encounter with {Name} found at {Latitude}, {Longitude}", [
+            $this->getLogger()->info("{State} encounter with {Name} found at {Latitude}, {Longitude}. Expires in {Expiry} minutes.", [
                 'State' => $pokemon->isNewEncounter() ? 'New' : 'Existing',
                 'Name' => $pokemon->getName(),
                 'Latitude'  => $pokemon->getLatitude(),
-                'Longitude' => $pokemon->getLongitude()
+                'Longitude' => $pokemon->getLongitude(),
+                'Expiry' => $pokemon->getExpiryInMinutes()
             ]);
 
             /* Update internal array */
