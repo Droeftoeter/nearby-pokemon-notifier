@@ -69,6 +69,18 @@ class Notifier
     }
 
     /**
+     * Overrides the internal steps array
+     *
+     * @param array $steps
+     * @return Notifier
+     */
+    public function overrideSteps(array $steps) : self
+    {
+        $this->steps = $steps;
+        return $this;
+    }
+
+    /**
      * Attach a handler
      *
      * @param Handler $handler
