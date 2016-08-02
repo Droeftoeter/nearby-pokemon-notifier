@@ -188,6 +188,9 @@ class Notifier
             foreach ($this->handlers as $handler) {
                 $handler->notify($pokemon);
             }
+
+            /* Cleanup */
+            $this->checkExpired();
         }
     }
 
