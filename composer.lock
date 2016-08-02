@@ -311,12 +311,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/NicklasWallgren/s2-geometry-library-php.git",
-                "reference": "3c24101bc67c44e22d879c1c651525cda9a13222"
+                "reference": "7b70a341ba75290d526335f9874307df2306a540"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/NicklasWallgren/s2-geometry-library-php/zipball/3c24101bc67c44e22d879c1c651525cda9a13222",
-                "reference": "3c24101bc67c44e22d879c1c651525cda9a13222",
+                "url": "https://api.github.com/repos/NicklasWallgren/s2-geometry-library-php/zipball/7b70a341ba75290d526335f9874307df2306a540",
+                "reference": "7b70a341ba75290d526335f9874307df2306a540",
                 "shasum": ""
             },
             "require-dev": {
@@ -330,7 +330,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "description": "Fork - Port of s2-geometry-library-java into PHP",
-            "time": "2016-07-28 17:01:29"
+            "time": "2016-08-02 15:06:32"
         },
         {
             "name": "predis/predis",
@@ -475,7 +475,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Sjaakmoes/pokapi.git",
-                "reference": "c487be717f530310bc644284335240c8d2cc3cb2"
+                "reference": "7f38b15f52d14b5517c3798b82ce0c68b7d5f110"
             },
             "require": {
                 "guzzlehttp/guzzle": "^6.2",
@@ -499,7 +499,7 @@
                     "email": "freek@kobalt.blue"
                 }
             ],
-            "time": "2016-08-01 22:02:18"
+            "time": "2016-08-02 16:24:12"
         }
     ],
     "packages-dev": [],

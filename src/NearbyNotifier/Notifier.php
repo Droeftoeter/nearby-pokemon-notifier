@@ -53,10 +53,19 @@ class Notifier
      */
     protected $stepInterval = 1000 * 1000; // 1 second.
 
-    public function __construct(Provider $authProvider, float $latitude, float $longitude, int $steps = 5)
+    /**
+     * Notifier constructor.
+     *
+     * @param Provider $authProvider
+     * @param float $latitude
+     * @param float $longitude
+     * @param int $steps
+     * @param float $radius
+     */
+    public function __construct(Provider $authProvider, float $latitude, float $longitude, int $steps = 5, float $radius = 0.07)
     {
         $this->api = new API($authProvider, $latitude, $longitude);
-        $this->steps = Geo::generateSteps($latitude, $longitude, $steps);
+        $this->steps = Geo::generateSteps($latitude, $longitude, $steps, $radius);
     }
 
     /**
@@ -76,6 +85,11 @@ class Notifier
      */
     public function run()
     {
+
+        /* Initialize */
+        $this->init();
+
+        /* Loop */
         while (true) {
             foreach ($this->steps as $index => $step) {
                 $this->api->setLocation($step[0], $step[1]);
@@ -115,6 +129,18 @@ class Notifier
             ]);
             usleep($this->loopInterval);
         }
+    }
+
+    /**
+     * Call these first
+     *
+     * If we don't then the Pokemon Go API will not recognize new accounts.
+     */
+    public function init()
+    {
+        $this->api->getPlayerData();
+        $this->api->getInventory();
+        $this->api->downloadSettings();
     }
 
     /**
