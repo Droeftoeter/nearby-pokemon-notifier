@@ -7,8 +7,11 @@
 
 ## Example
 Check out the ```examples/slack.php``` file. Don't forget to set your configuration.
+For a forked example, check out the ```examples/forked.php``` file.
 
 ## Usage
+
+Because of recent changes, the default step-interval is set at 6 seconds. If you want to search a bigger area, use the ForkedNotifier with multiple accounts.
 
 ```php
 // Create a new notifier with a PTC username, password 
@@ -17,7 +20,8 @@ $notifier = new Notifier(
     new TrainersClub('username', 'password'),
     51.436596, // Latitude
     5.478001, // Longitude
-    5 // The amount of steps to walk
+    5, // The amount of steps to walk
+    0.07 // The search radius
 );
 
 // Attach a new Slack handler
@@ -45,8 +49,32 @@ $notifier->attach(new Slack(
     ]
 ));
 
-// To run the notifier
+// To run the notifier once:
 $notifier->run();
+
+// Or in a loop:
+$notifier->runContinously();
+```
+
+## Multiple accounts
+
+If you want to speed up the search, you can use the ForkedNotifier.
+The workload will be split up between all of the provided accounts, running as seperate children.
+
+```php
+// Create a forked notifier with multiple accounts
+// and your current latitude and longitude.
+$notifier = new ForkedNotifier(
+    [
+        new TrainersClub('username', 'password'),
+        new TrainersClub('username2', 'password2'),
+        new TrainersClub('username3', 'password3'),
+    ],
+    51.436596, // Latitude
+    5.478001, // Longitude
+    5, // The amount of steps to walk,
+    0.07 // The search radius. 
+);
 ```
 
 ## Handlers

@@ -10,7 +10,6 @@
     "prefer-stable" : true,
     "require": {
         "php": ">=7.0.0",
-        "ext-curl": "*",
         "maknz/slack": "^1.7",
         "sjaakmoes/pokapi": "dev-master",
         "monolog/monolog": "^1.21",
