@@ -3,6 +3,7 @@ namespace NearbyNotifier;
 
 use POGOProtos\Map\Pokemon\WildPokemon;
 use NearbyNotifier\Entity\Pokemon;
+use POGOProtos\Networking\Responses\GetMapObjectsResponse;
 use Pokapi\API;
 use Pokapi\Authentication\Provider;
 use Pokapi\Exception\Exception;
@@ -52,32 +53,48 @@ class Notifier extends BaseNotifier
                 'Steps' => count($this->steps)
             ]);
 
-            try {
-                $response = $this->api->getMapObjects();
-            } catch(Exception $e) {
-                // Log and skip...
-                $this->getLogger()->error('An exception has been thrown while fetching map objects: {Exception}', [
-                    'Exception' => $e
-                ]);
-                usleep($this->stepInterval);
-                continue;
-            }
-
-            /** @var \POGOProtos\Map\MapCell $mapCell */
-            foreach ($response->getMapCellsList() as $mapCell) {
-                if ($mapCell->getWildPokemonsList() && $mapCell->getWildPokemonsList()->count() > 0) {
-                    $wildPokemons = $mapCell->getWildPokemonsList();
-
-                    foreach ($wildPokemons as $wildPokemon) {
-                        $this->addEncounter($wildPokemon);
-                    }
-                }
-            }
+            $this->fetchObjects();
             usleep($this->stepInterval);
         }
 
         /* Clean up storage after each loop */
         $this->getStorage()->cleanup();
+    }
+
+    /**
+     * Fetch map objects
+     */
+    public function fetchObjects()
+    {
+        try {
+            return $this->handleResponse($this->api->getMapObjects());
+        } catch(Exception $e) {
+            // Log and retry.
+            $this->getLogger()->error('An exception has been thrown while fetching map objects: {Exception}', [
+                'Exception' => $e
+            ]);
+            usleep($this->stepInterval);
+            return $this->fetchObjects();
+        }
+    }
+
+    /**
+     * Handle the response
+     *
+     * @param GetMapObjectsResponse $response
+     */
+    public function handleResponse(GetMapObjectsResponse $response)
+    {
+        /** @var \POGOProtos\Map\MapCell $mapCell */
+        foreach ($response->getMapCellsList() as $mapCell) {
+            if ($mapCell->getWildPokemonsList() && $mapCell->getWildPokemonsList()->count() > 0) {
+                $wildPokemons = $mapCell->getWildPokemonsList();
+
+                foreach ($wildPokemons as $wildPokemon) {
+                    $this->addEncounter($wildPokemon);
+                }
+            }
+        }
     }
 
     /**
