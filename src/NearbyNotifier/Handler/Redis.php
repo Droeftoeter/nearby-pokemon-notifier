@@ -21,12 +21,24 @@ class Redis extends Handler
     protected $predis;
 
     /**
+     * @var string
+     */
+    protected $prefix;
+
+    /**
+     * @var string|null
+     */
+    protected $channel;
+
+    /**
      * Redis constructor.
      *
      * @param Client $predis
      * @param array $filters
+     * @param string $prefix
+     * @param string $channel
      */
-    public function __construct(Client $predis, array $filters = [])
+    public function __construct(Client $predis, array $filters = [], string $prefix = 'encounter', string $channel = null)
     {
         parent::__construct($filters);
         $this->predis = $predis;
@@ -39,19 +51,15 @@ class Redis extends Handler
      */
     public function handle(Pokemon $pokemon)
     {
-        if ($pokemon->isNewEncounter()) {
-            $this->addToRedis($pokemon);
-        }
-    }
-
-    /**
-     * Add to Redis
-     *
-     * @param Pokemon $pokemon
-     */
-    protected function addToRedis(Pokemon $pokemon)
-    {
         $expiry = $pokemon->getExpiry()->getTimestamp() - time();
-        $this->predis->setex($pokemon->getEncounterId(), $expiry, json_encode($pokemon->jsonSerialize()));
+        $serialized = json_encode($pokemon);
+
+        /* Set with expiration */
+        $this->predis->setex($this->prefix . '_' . $pokemon->getEncounterId(), $expiry, $serialized);
+
+        /* Publish on channel if set */
+        if ($this->channel !== null) {
+            $this->predis->publish($this->channel, $serialized);
+        }
     }
 }

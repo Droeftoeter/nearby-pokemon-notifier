@@ -70,6 +70,7 @@ class ForkedNotifier extends BaseNotifier
         /* Spawn a fork for every authentication provider */
         foreach ($stepChunks as $chunk => $steps) {
             $this->pids[] = $this->fork($steps, $this->authProviders[$chunk]);
+            sleep(1);
         }
 
         /* If parent process, wait for all children to finish */
@@ -110,6 +111,7 @@ class ForkedNotifier extends BaseNotifier
         $pid = pcntl_fork();
         if (!$pid) {
             $notifier = new Notifier($authProvider, $this->latitude, $this->longitude, 1, 0.07);
+            $notifier->setStorage($this->getStorage());
             $notifier->overrideSteps($steps);
             $notifier->setLogger($this->getLogger());
             $notifier->init();

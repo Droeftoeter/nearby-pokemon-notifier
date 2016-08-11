@@ -1,14 +1,12 @@
 <?php
 namespace NearbyNotifier;
-use NearbyNotifier\Entity\Pokemon;
-use NearbyNotifier\Handler\Handler;
+
 use POGOProtos\Map\Pokemon\WildPokemon;
+use NearbyNotifier\Entity\Pokemon;
 use Pokapi\API;
 use Pokapi\Authentication\Provider;
+use Pokapi\Exception\Exception;
 use Pokapi\Exception\NoResponse;
-use Pokapi\Utility\Geo;
-use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 
 /**
  * Class Notifier
@@ -18,11 +16,6 @@ use Psr\Log\NullLogger;
  */
 class Notifier extends BaseNotifier
 {
-
-    /**
-     * @var Pokemon[]
-     */
-    protected $encounters = [];
 
     /**
      * @var API
@@ -61,21 +54,20 @@ class Notifier extends BaseNotifier
 
             try {
                 $response = $this->api->getMapObjects();
-            } catch(\Pokapi\Exception\Exception $e) {
+            } catch(Exception $e) {
                 // Log and skip...
                 $this->getLogger()->error('An exception has been thrown while fetching map objects: {Exception}', [
                     'Exception' => $e
                 ]);
-                usleep($this->loopInterval);
+                usleep($this->stepInterval);
                 continue;
             }
 
             /** @var \POGOProtos\Map\MapCell $mapCell */
-            foreach ($response->getMapCellsArray() as $mapCell) {
-                if ($mapCell->getWildPokemonsCount() > 0) {
-                    $wildPokemons = $mapCell->getWildPokemonsArray();
+            foreach ($response->getMapCellsList() as $mapCell) {
+                if ($mapCell->getWildPokemonsList() && $mapCell->getWildPokemonsList()->count() > 0) {
+                    $wildPokemons = $mapCell->getWildPokemonsList();
 
-                    /** @var \POGOProtos\Map\Pokemon\WildPokemon $wildPokemon */
                     foreach ($wildPokemons as $wildPokemon) {
                         $this->addEncounter($wildPokemon);
                     }
@@ -83,6 +75,9 @@ class Notifier extends BaseNotifier
             }
             usleep($this->stepInterval);
         }
+
+        /* Clean up storage after each loop */
+        $this->getStorage()->cleanup();
     }
 
     /**
@@ -107,14 +102,14 @@ class Notifier extends BaseNotifier
     public function init()
     {
         try {
-            $this->api->getPlayerData();
-            $this->api->getInventory();
-            $this->api->downloadSettings();
+            $this->api->initialize();
         } catch(NoResponse $e) {
             $this->getLogger()->error('Failed initialization, retrying...');
             sleep(5);
             return $this->init();
         }
+
+        return true;
     }
 
     /**
@@ -131,52 +126,24 @@ class Notifier extends BaseNotifier
                 $wildPokemon->getEncounterId(),
                 $wildPokemon->getLatitude(),
                 $wildPokemon->getLongitude(),
-                $wildPokemon->getPokemonData()->getPokemonId(),
-                $wildPokemon->getTimeTillHiddenMs(),
-                $this->hasEncounter($wildPokemon->getEncounterId())
+                $wildPokemon->getPokemonData()->getPokemonId()->value(),
+                $wildPokemon->getTimeTillHiddenMs()
             );
+
+            $isNew = $this->getStorage()->isNew($pokemon);
 
             /* Log */
             $this->getLogger()->info("{State} encounter with {Name} found at {Latitude}, {Longitude}. Expires in {Expiry} minutes.", [
-                'State' => $pokemon->isNewEncounter() ? 'New' : 'Existing',
+                'State' => $isNew ? 'New' : 'Existing',
                 'Name' => $pokemon->getName(),
                 'Latitude'  => $pokemon->getLatitude(),
                 'Longitude' => $pokemon->getLongitude(),
                 'Expiry' => $pokemon->getExpiryInMinutes()
             ]);
 
-            /* Update internal array */
-            $this->encounters[$wildPokemon->getEncounterId()] = $pokemon;
-
             /* Notify listeners */
             foreach ($this->handlers as $handler) {
                 $handler->notify($pokemon);
-            }
-
-            /* Cleanup */
-            $this->checkExpired();
-        }
-    }
-
-    /**
-     * Check if we already have a encounter
-     *
-     * @param int $encounterId
-     * @return bool
-     */
-    protected function hasEncounter(int $encounterId) : bool
-    {
-        return !array_key_exists($encounterId, $this->encounters);
-    }
-
-    /**
-     * Check expired state
-     */
-    protected function checkExpired()
-    {
-        foreach ($this->encounters as $encounterId => $pokemon) {
-            if ($pokemon->hasExpired()) {
-                unset($this->encounters[$encounterId]);
             }
         }
     }

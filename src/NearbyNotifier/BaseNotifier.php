@@ -2,6 +2,8 @@
 namespace NearbyNotifier;
 
 use NearbyNotifier\Handler\Handler;
+use NearbyNotifier\Storage\Process;
+use NearbyNotifier\Storage\Storage;
 use Pokapi\Utility\Geo;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -31,6 +33,11 @@ abstract class BaseNotifier
     protected $logger;
 
     /**
+     * @var Storage
+     */
+    protected $storage;
+
+    /**
      * @var float
      */
     protected $latitude;
@@ -48,7 +55,7 @@ abstract class BaseNotifier
     /**
      * @var int
      */
-    protected $stepInterval = 6000 * 1000; // 6 seconds.
+    protected $stepInterval = 16000 * 1000; // 16 seconds.
 
     /**
      * BaseNotifier constructor.
@@ -117,6 +124,19 @@ abstract class BaseNotifier
     }
 
     /**
+     * Set the storage adapter
+     *
+     * @param Storage $storage
+     *
+     * @return BaseNotifier
+     */
+    public function setStorage(Storage $storage) : self
+    {
+        $this->storage = $storage;
+        return $this;
+    }
+
+    /**
      * Set the step interval in milliseconds
      *
      * @param int $interval
@@ -152,5 +172,20 @@ abstract class BaseNotifier
         }
 
         return $this->logger;
+    }
+
+    /**
+     * Get the storage
+     *
+     * @return Storage
+     */
+    protected function getStorage() : Storage
+    {
+        if (!$this->storage instanceof Storage)
+        {
+            $this->storage = new Process();
+        }
+
+        return $this->storage;
     }
 }

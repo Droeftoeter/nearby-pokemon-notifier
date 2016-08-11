@@ -1,10 +1,10 @@
 <?php
 namespace NearbyNotifier\Entity;
 
-use POGOProtos\Enums\PokemonId;
 use DateTime;
 use DateInterval;
 use JsonSerializable;
+use POGOProtos\Enums\PokemonId;
 
 /**
  * Class Pokemon
@@ -40,11 +40,6 @@ class Pokemon implements JsonSerializable
     protected $expiry;
 
     /**
-     * @var bool
-     */
-    protected $newEncounter;
-
-    /**
      * Pokemon constructor.
      *
      * @param int $id
@@ -52,15 +47,13 @@ class Pokemon implements JsonSerializable
      * @param float $longitude
      * @param int $pokemonId
      * @param int $expiry
-     * @param bool $newEncounter
      */
-    public function __construct(int $id, float $latitude, float $longitude, int $pokemonId, int $expiry, bool $newEncounter = false)
+    public function __construct(int $id, float $latitude, float $longitude, int $pokemonId, int $expiry)
     {
         $this->encounterId = $id;
         $this->id = $pokemonId;
         $this->latitude = $latitude;
         $this->longitude = $longitude;
-        $this->newEncounter = $newEncounter;
 
         $expires = new DateTime();
         $expires->add(new DateInterval('PT' . floor($expiry / 1000) . 'S'));
@@ -114,7 +107,7 @@ class Pokemon implements JsonSerializable
      */
     public function getName() : string
     {
-        return ucfirst(strtolower(PokemonId::$_values[$this->id]));
+        return ucfirst(strtolower(PokemonId::valueOf($this->id)));
     }
 
     /**
@@ -150,16 +143,6 @@ class Pokemon implements JsonSerializable
     }
 
     /**
-     * Check if new encounter
-     *
-     * @return bool
-     */
-    public function isNewEncounter() : bool
-    {
-        return $this->newEncounter;
-    }
-
-    /**
      * To array
      *
      * @return array
@@ -172,8 +155,7 @@ class Pokemon implements JsonSerializable
             'name' => $this->getName(),
             'latitude' => $this->getLatitude(),
             'longitude' => $this->getLongitude(),
-            'expiresAt' => $this->getExpiry()->getTimestamp(),
-            'new' => $this->isNewEncounter()
+            'expiresAt' => $this->getExpiry()->getTimestamp()
         ];
     }
 }
