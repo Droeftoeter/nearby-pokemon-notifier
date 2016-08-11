@@ -31,7 +31,7 @@ class Notifier extends BaseNotifier
      * @param int $steps
      * @param float $radius
      */
-    public function __construct(Provider $authProvider, float $latitude, float $longitude, int $steps = 5, float $radius = 0.07)
+    public function __construct(Provider $authProvider, float $latitude, float $longitude, int $steps = 5, float $radius = 0.04)
     {
         parent::__construct($latitude, $longitude, $steps, $radius);
         $this->api = new API($authProvider, $latitude, $longitude);

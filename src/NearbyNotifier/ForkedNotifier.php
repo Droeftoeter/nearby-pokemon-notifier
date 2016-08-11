@@ -31,7 +31,7 @@ class ForkedNotifier extends BaseNotifier
      * @param int $steps
      * @param float $radius
      */
-    public function __construct(array $authProviders, float $latitude, float $longitude, int $steps = 5, float $radius = 0.07)
+    public function __construct(array $authProviders, float $latitude, float $longitude, int $steps = 5, float $radius = 0.04)
     {
         parent::__construct($latitude, $longitude, $steps, $radius);
         foreach ($authProviders as $authProvider) {

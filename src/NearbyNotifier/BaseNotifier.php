@@ -55,7 +55,7 @@ abstract class BaseNotifier
     /**
      * @var int
      */
-    protected $stepInterval = 16000 * 1000; // 16 seconds.
+    protected $stepInterval = 12000 * 1000; // 12 seconds.
 
     /**
      * BaseNotifier constructor.
@@ -65,7 +65,7 @@ abstract class BaseNotifier
      * @param int $steps
      * @param float $radius
      */
-    public function __construct(float $latitude, float $longitude, int $steps = 5, float $radius = 0.07)
+    public function __construct(float $latitude, float $longitude, int $steps = 5, float $radius = 0.04)
     {
         $this->latitude = $latitude;
         $this->longitude = $longitude;
