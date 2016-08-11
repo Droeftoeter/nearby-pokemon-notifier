@@ -115,6 +115,7 @@ class ForkedNotifier extends BaseNotifier
             $notifier->overrideSteps($steps);
             $notifier->setLogger($this->getLogger());
             $notifier->init();
+            sleep(1);
 
             foreach ($this->handlers as $handler) {
                 $notifier->attach($handler);
