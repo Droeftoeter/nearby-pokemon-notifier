@@ -21,6 +21,26 @@ class Mysql extends Handler
     protected $pdo;
 
     /**
+     * @var string
+     */
+    protected $host;
+
+    /**
+     * @var string
+     */
+    protected $database;
+
+    /**
+     * @var string
+     */
+    protected $username;
+
+    /**
+     * @var string
+     */
+    protected $password;
+
+    /**
      * Mysql constructor.
      *
      * @param string $host
@@ -32,7 +52,10 @@ class Mysql extends Handler
     public function __construct(string $host, string $database, string $username, string $password, array $filters = [])
     {
         parent::__construct($filters);
-        $this->pdo = new PDO('mysql:host=' . $host . ';dbname=' . $database, $username, $password);
+        $this->host = $host;
+        $this->database = $database;
+        $this->username = $username;
+        $this->password = $password;
     }
 
     /**
@@ -44,15 +67,31 @@ class Mysql extends Handler
     public function handle(Pokemon $pokemon, bool $newEncounter)
     {
         if ($newEncounter) {
-            $query = $this->pdo->prepare("INSERT IGNORE INTO pokemon VALUES(:encounter, :pokemon, :spawnPoint, :timestamp, :latitude, :longitude, :tth)");
+            $query = $this->getPdo()->prepare("INSERT INTO pokemon VALUES(:encounter, :pokemon, :spawnPoint, :ts, :latitude, :longitude, :tth)");
             $query->bindValue('encounter', $pokemon->getEncounterId(), PDO::PARAM_INT);
             $query->bindValue('pokemon', $pokemon->getPokemonId(), PDO::PARAM_INT);
             $query->bindValue('spawnPoint', $pokemon->getSpawnPoint());
-            $query->bindValue('timestamp', $pokemon->getTimestamp(), PDO::PARAM_INT);
+            $query->bindValue('ts', $pokemon->getTimestamp(), PDO::PARAM_INT);
             $query->bindValue('latitude', $pokemon->getLatitude());
             $query->bindValue('longitude', $pokemon->getLongitude());
-            $query->bindValue('tth', $pokemon->getExpiry()->getTimestamp());
+            $query->bindValue('tth', $pokemon->getExpiry()->getTimestamp(), PDO::PARAM_INT);
             $query->execute();
+
+            echo $query->errorInfo();
         }
+    }
+
+    /**
+     * Get the connection
+     *
+     * @return PDO
+     */
+    protected function getPdo()
+    {
+        if ($this->pdo === null) {
+            $this->pdo = new PDO('mysql:host=' . $this->host . ';dbname=' . $this->database, $this->username, $this->password);
+        }
+
+        return $this->pdo;
     }
 }
