@@ -67,7 +67,7 @@ class Mysql extends Handler
     public function handle(Pokemon $pokemon, bool $newEncounter)
     {
         if ($newEncounter) {
-            $query = $this->getPdo()->prepare("INSERT INTO pokemon VALUES(:encounter, :pokemon, :spawnPoint, :ts, :latitude, :longitude, :tth)");
+            $query = $this->getPdo()->prepare("INSERT INTO pokemon VALUES(:encounter, :pokemon, :spawnPoint, :ts, :latitude, :longitude, :tth, :pokemonName)");
             $query->bindValue('encounter', $pokemon->getEncounterId(), PDO::PARAM_INT);
             $query->bindValue('pokemon', $pokemon->getPokemonId(), PDO::PARAM_INT);
             $query->bindValue('spawnPoint', $pokemon->getSpawnPoint());
@@ -75,9 +75,8 @@ class Mysql extends Handler
             $query->bindValue('latitude', $pokemon->getLatitude());
             $query->bindValue('longitude', $pokemon->getLongitude());
             $query->bindValue('tth', $pokemon->getExpiry()->getTimestamp(), PDO::PARAM_INT);
+            $query->bindValue('pokemonName', $pokemon->getName());
             $query->execute();
-
-            echo $query->errorInfo();
         }
     }
 
