@@ -24,6 +24,11 @@ class Notifier extends BaseNotifier
     protected $api;
 
     /**
+     * @var int
+     */
+    protected $encounters = 0;
+
+    /**
      * Notifier constructor.
      *
      * @param Provider $authProvider
@@ -107,6 +112,11 @@ class Notifier extends BaseNotifier
             $this->getLogger()->debug('Waiting {LoopInterval} seconds before restarting...', [
                 'LoopInterval' => round($this->loopInterval/1000/1000)
             ]);
+
+            if ($this->encounters === 0) {
+                $this->getLogger()->alert('No wild pokemons encountered. Softbanned?');
+            }
+
             usleep($this->loopInterval);
         }
     }
@@ -163,5 +173,7 @@ class Notifier extends BaseNotifier
                 $handler->notify($pokemon);
             }
         }
+
+        $this->encounters++;
     }
 }
