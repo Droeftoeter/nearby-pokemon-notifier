@@ -45,7 +45,7 @@ class Pokemon implements JsonSerializable
     protected $timestamp;
 
     /**
-     * @var int
+     * @var string
      */
     protected $spawnPoint;
 
@@ -57,10 +57,10 @@ class Pokemon implements JsonSerializable
      * @param float $longitude
      * @param int $pokemonId
      * @param int $expiry
-     * @param int|null $spawnPoint
+     * @param string|null $spawnPoint
      * @param int|null $timestamp
      */
-    public function __construct(int $id, float $latitude, float $longitude, int $pokemonId, int $expiry, int $spawnPoint = null, int $timestamp = null)
+    public function __construct(int $id, float $latitude, float $longitude, int $pokemonId, int $expiry, string $spawnPoint = null, int $timestamp = null)
     {
         $this->encounterId = $id;
         $this->id = $pokemonId;
@@ -159,7 +159,7 @@ class Pokemon implements JsonSerializable
     /**
      * Get the spawnpoint
      *
-     * @return int|null
+     * @return string|null
      */
     public function getSpawnPoint()
     {
