@@ -40,6 +40,16 @@ class Pokemon implements JsonSerializable
     protected $expiry;
 
     /**
+     * @var int
+     */
+    protected $timestamp;
+
+    /**
+     * @var int
+     */
+    protected $spawnPoint;
+
+    /**
      * Pokemon constructor.
      *
      * @param int $id
@@ -47,13 +57,17 @@ class Pokemon implements JsonSerializable
      * @param float $longitude
      * @param int $pokemonId
      * @param int $expiry
+     * @param int|null $spawnPoint
+     * @param int|null $timestamp
      */
-    public function __construct(int $id, float $latitude, float $longitude, int $pokemonId, int $expiry)
+    public function __construct(int $id, float $latitude, float $longitude, int $pokemonId, int $expiry, int $spawnPoint = null, int $timestamp = null)
     {
         $this->encounterId = $id;
         $this->id = $pokemonId;
         $this->latitude = $latitude;
         $this->longitude = $longitude;
+        $this->timestamp = $timestamp;
+        $this->spawnPoint = $spawnPoint;
 
         $expires = new DateTime();
         $expires->add(new DateInterval('PT' . floor($expiry / 1000) . 'S'));
@@ -140,6 +154,26 @@ class Pokemon implements JsonSerializable
     {
         $now = new DateTime();
         return floor(($this->expiry->getTimestamp() - $now->getTimestamp()) / 60);
+    }
+
+    /**
+     * Get the spawnpoint
+     *
+     * @return int|null
+     */
+    public function getSpawnPoint()
+    {
+        return $this->spawnPoint;
+    }
+
+    /**
+     * Get the timestamp
+     *
+     * @return int|null
+     */
+    public function getTimestamp()
+    {
+        return $this->timestamp;
     }
 
     /**

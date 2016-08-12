@@ -154,7 +154,9 @@ class Notifier extends BaseNotifier
                 $wildPokemon->getLatitude(),
                 $wildPokemon->getLongitude(),
                 $wildPokemon->getPokemonData()->getPokemonId()->value(),
-                $wildPokemon->getTimeTillHiddenMs()
+                $wildPokemon->getTimeTillHiddenMs(),
+                $wildPokemon->getSpawnPointId(),
+                $wildPokemon->getLastModifiedTimestampMs()
             );
 
             $isNew = $this->getStorage()->isNew($pokemon);
@@ -170,7 +172,7 @@ class Notifier extends BaseNotifier
 
             /* Notify listeners */
             foreach ($this->handlers as $handler) {
-                $handler->notify($pokemon);
+                $handler->notify($pokemon, $isNew);
             }
         }
 

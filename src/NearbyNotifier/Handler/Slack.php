@@ -53,10 +53,11 @@ class Slack extends Handler
      * Notify slack of new pokemon!
      *
      * @param Pokemon $pokemon
+     * @param bool $newEncounter
      */
-    protected function handle(Pokemon $pokemon)
+    protected function handle(Pokemon $pokemon, bool $newEncounter)
     {
-        if ($pokemon->isNewEncounter()) {
+        if ($newEncounter) {
             $this->client
                 ->withIcon('https://pbs.twimg.com/profile_images/1206423764/Ashbot.PNG')
                 ->attach([

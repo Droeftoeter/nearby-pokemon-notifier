@@ -35,10 +35,11 @@ abstract class Handler
      * Notifies of Pokemon
      *
      * @param Pokemon $pokemon
+     * @param bool $newEncounter
      *
      * @return void
      */
-    public function notify(Pokemon $pokemon)
+    public function notify(Pokemon $pokemon, bool $newEncounter)
     {
         foreach ($this->filters as $filter)
         {
@@ -47,7 +48,7 @@ abstract class Handler
             }
         }
 
-        $this->handle($pokemon);
+        $this->handle($pokemon, $newEncounter);
     }
 
     /**
@@ -67,8 +68,9 @@ abstract class Handler
      * Handle Pokemon that passed the filters
      *
      * @param Pokemon $pokemon
+     * @param bool $newEncounter
      *
      * @return void
      */
-    abstract protected function handle(Pokemon $pokemon);
+    abstract protected function handle(Pokemon $pokemon, bool $newEncounter);
 }

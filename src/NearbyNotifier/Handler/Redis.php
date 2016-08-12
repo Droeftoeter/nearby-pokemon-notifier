@@ -48,8 +48,9 @@ class Redis extends Handler
      * Handle
      *
      * @param Pokemon $pokemon
+     * @param bool $newEncounter
      */
-    public function handle(Pokemon $pokemon)
+    public function handle(Pokemon $pokemon, bool $newEncounter)
     {
         $expiry = $pokemon->getExpiry()->getTimestamp() - time();
         $serialized = json_encode($pokemon);
