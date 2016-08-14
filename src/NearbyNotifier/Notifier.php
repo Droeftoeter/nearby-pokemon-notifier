@@ -146,7 +146,7 @@ class Notifier extends BaseNotifier
      */
     protected function addEncounter(WildPokemon $wildPokemon)
     {
-        if ($wildPokemon->getTimeTillHiddenMs() > 0) {
+        if ($wildPokemon->getTimeTillHiddenMs() > 0 && $wildPokemon->getLastModifiedTimestampMs() < 3600000) {
 
             /* Create entity */
             $pokemon = new Pokemon(
