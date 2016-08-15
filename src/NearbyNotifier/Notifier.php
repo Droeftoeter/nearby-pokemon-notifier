@@ -8,6 +8,8 @@ use Pokapi\API;
 use Pokapi\Authentication\Provider;
 use Pokapi\Exception\Exception;
 use Pokapi\Exception\NoResponse;
+use Pokapi\Request\DeviceInfo;
+use Pokapi\Request\Position;
 
 /**
  * Class Notifier
@@ -32,15 +34,17 @@ class Notifier extends BaseNotifier
      * Notifier constructor.
      *
      * @param Provider $authProvider
+     * @param DeviceInfo $deviceInfo
      * @param float $latitude
      * @param float $longitude
      * @param int $steps
      * @param float $radius
      */
-    public function __construct(Provider $authProvider, float $latitude, float $longitude, int $steps = 5, float $radius = 0.04)
+    public function __construct(Provider $authProvider, DeviceInfo $deviceInfo, float $latitude, float $longitude, int $steps = 5, float $radius = 0.04)
     {
         parent::__construct($latitude, $longitude, $steps, $radius);
-        $this->api = new API($authProvider, $latitude, $longitude);
+        $position = new Position($latitude, $longitude, 12.0);
+        $this->api = new API($authProvider, $position, $deviceInfo);
     }
 
     /**
@@ -50,7 +54,8 @@ class Notifier extends BaseNotifier
     {
         /* Loop */
         foreach ($this->steps as $index => $step) {
-            $this->api->setLocation($step[0], $step[1]);
+            $newPosition = new Position($step[0], $step[1], 12.0);
+            $this->api->setPosition($newPosition);
 
             /* Log */
             $this->getLogger()->debug("Walking {Step} of {Steps}", [

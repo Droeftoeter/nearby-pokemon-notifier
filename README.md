@@ -18,10 +18,11 @@ Because of recent changes, the default step-interval is set at 6 seconds. If you
 // and your current latitude and longitude.
 $notifier = new Notifier(
     new TrainersClub('username', 'password'),
+    DeviceInfo::getDefault('unique_device_id'),
     51.436596, // Latitude
     5.478001, // Longitude
     5, // Step amount, each step is a wider area around the previous.
-    0.07 // The scan area per request. The stepper will generate steps based on this and the amount of steps.
+    0.04 // The scan area per request. The stepper will generate steps based on this and the amount of steps.
 );
 
 // Attach a new Slack handler
@@ -70,10 +71,15 @@ $notifier = new ForkedNotifier(
         new TrainersClub('username2', 'password2'),
         new TrainersClub('username3', 'password3'),
     ],
+    [
+        DeviceInfo::getDefault('unique_device_id_1'),
+        DeviceInfo::getDefault('unique_device_id_2'),
+        DeviceInfo::getDefault('unique_device_id_3'),
+    ],
     51.436596, // Latitude
     5.478001, // Longitude
     5, // Step amount, each step is a wider area around the previous.
-    0.07 // The scan area per request. The stepper will generate steps based on this and the amount of steps.
+    0.04 // The scan area per request. The stepper will generate steps based on this and the amount of steps.
 );
 ```
 

@@ -8,6 +8,7 @@ use NearbyNotifier\Filter\Rarity;
 use NearbyNotifier\ForkedNotifier;
 use NearbyNotifier\Handler\Slack;
 use Pokapi\Authentication\TrainersClub;
+use Pokapi\Request\DeviceInfo;
 
 require '../vendor/autoload.php';
 date_default_timezone_set("Europe/Amsterdam");
@@ -17,7 +18,7 @@ $settings = [
     'latitude' => 51.436596, // Eindhoven!
     'longitude' => 5.478001,
     'steps' => 6,
-    'radius' => 0.07, // 70 Meters!
+    'radius' => 0.04, // 70 Meters!
     'slackhook' => '',
 ];
 
@@ -28,9 +29,17 @@ $providers = [
     new TrainersClub('ACCOUNT_3', 'PASSWORD_3')
 ];
 
+/* Device Info */
+$deviceInfo = [
+    DeviceInfo::getDefault('DEVICE_ID_1'),
+    DeviceInfo::getDefault('DEVICE_ID_2'),
+    DeviceInfo::getDefault('DEVICE_ID_3'),
+];
+
 /* Instantiate notifier */
 $notifier = new ForkedNotifier(
     $providers,
+    $deviceInfo,
     $settings['latitude'],
     $settings['longitude'],
     $settings['steps'],

@@ -2,6 +2,8 @@
 namespace NearbyNotifier;
 
 use Pokapi\Authentication\Provider;
+use Pokapi\Request\DeviceInfo;
+use Exception;
 
 /**
  * Class ForkedNotifier
@@ -18,6 +20,11 @@ class ForkedNotifier extends BaseNotifier
     protected $authProviders;
 
     /**
+     * @var DeviceInfo[]
+     */
+    protected $deviceInfo;
+
+    /**
      * @var int[]
      */
     protected $pids = [];
@@ -25,17 +32,22 @@ class ForkedNotifier extends BaseNotifier
     /**
      * ForkedNotifier constructor.
      *
-     * @param array $authProviders
+     * @param Provider[] $authProviders
+     * @param DeviceInfo[] $deviceInfos
      * @param float $latitude
      * @param float $longitude
      * @param int $steps
      * @param float $radius
      */
-    public function __construct(array $authProviders, float $latitude, float $longitude, int $steps = 5, float $radius = 0.04)
+    public function __construct(array $authProviders, array $deviceInfos, float $latitude, float $longitude, int $steps = 5, float $radius = 0.04)
     {
         parent::__construct($latitude, $longitude, $steps, $radius);
         foreach ($authProviders as $authProvider) {
             $this->addAuthProvider($authProvider);
+        }
+
+        foreach ($deviceInfos as $deviceInfo) {
+            $this->addDeviceInfo($deviceInfo);
         }
     }
 
@@ -43,6 +55,7 @@ class ForkedNotifier extends BaseNotifier
      * Add an authentication provider.
      *
      * @param Provider $authProvider
+     *
      * @return ForkedNotifier
      */
     public function addAuthProvider(Provider $authProvider) : self
@@ -52,24 +65,51 @@ class ForkedNotifier extends BaseNotifier
     }
 
     /**
+     * Add device information.
+     *
+     * @param DeviceInfo $deviceInfo
+     *
+     * @return ForkedNotifier
+     */
+    public function addDeviceInfo(DeviceInfo $deviceInfo) : self
+    {
+        $this->deviceInfo[] = $deviceInfo;
+        return $this;
+    }
+
+    /**
      * {@inheritDoc}
+     *
+     * @throws Exception
      */
     public function run()
     {
+        /* Check */
+        if (count($this->authProviders) > count($this->deviceInfo)) {
+            throw new Exception("Not enough devices for all accounts.");
+        }
+
         /* Splits the workload */
         $stepChunks = array_chunk($this->steps, ceil(count($this->steps) / count($this->authProviders)));
-        $this->getLogger()->debug("Splitting workload of {Total} into {Chunks} chunks.", [
-            'Total'  => count($this->steps),
+
+        /* Also walk back to prevent a softban */
+        foreach ($stepChunks as $chunkIndex => $steps) {
+            $reverse = array_slice(array_reverse($steps), 1, count($steps)-2);
+            $stepChunks[$chunkIndex] = array_merge($steps, $reverse);
+        }
+
+        $this->getLogger()->debug("Splitting workload of ~{Total} into {Chunks} chunks.", [
+            'Total'  => count($this->steps*2),
             'Chunks' => count($stepChunks)
         ]);
 
-        if (count($stepChunks[0]) > 100) {
+        if (count($stepChunks[0] * 2) > 100) {
             $this->getLogger()->alert("Chunk size is more than 100. Considering adding more accounts.");
         }
 
         /* Spawn a fork for every authentication provider */
         foreach ($stepChunks as $chunk => $steps) {
-            $this->pids[] = $this->fork($steps, $this->authProviders[$chunk]);
+            $this->pids[] = $this->fork($steps, $this->authProviders[$chunk], $this->deviceInfo[$chunk]);
             sleep(1);
         }
 
@@ -103,14 +143,15 @@ class ForkedNotifier extends BaseNotifier
      *
      * @param array $steps
      * @param Provider $authProvider
+     * @param DeviceInfo $deviceInfo
      *
      * @return int
      */
-    protected function fork(array $steps, Provider $authProvider) : int
+    protected function fork(array $steps, Provider $authProvider, DeviceInfo $deviceInfo) : int
     {
         $pid = pcntl_fork();
         if (!$pid) {
-            $notifier = new Notifier($authProvider, $this->latitude, $this->longitude, 1, 0.07);
+            $notifier = new Notifier($authProvider, $deviceInfo, $this->latitude, $this->longitude, 1, 0.07);
             $notifier->setStorage($this->getStorage());
             $notifier->overrideSteps($steps);
             $notifier->setLogger($this->getLogger());

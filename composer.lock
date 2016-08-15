@@ -179,6 +179,37 @@
             "time": "2016-06-24 23:00:38"
         },
         {
+            "name": "jaspervdm/pogoprotos-php",
+            "version": "v0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jaspervdm/pogoprotos-php.git",
+                "reference": "851a0530f197a62d3c9745a56f3c161cf2105bd3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jaspervdm/pogoprotos-php/zipball/851a0530f197a62d3c9745a56f3c161cf2105bd3",
+                "reference": "851a0530f197a62d3c9745a56f3c161cf2105bd3",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5",
+                "protobuf-php/protobuf": "~0.1"
+            },
+            "require-dev": {
+                "protobuf-php/protobuf-plugin": "~0.1"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "src/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "description": "Compiled PHP protobufs for pokemon go",
+            "time": "2016-08-14 18:42:41"
+        },
+        {
             "name": "maknz/slack",
             "version": "1.7.0",
             "source": {
@@ -462,7 +493,7 @@
         },
         {
             "name": "protobuf-php/protobuf",
-            "version": "dev-master",
+            "version": "v0.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/protobuf-php/protobuf.git",
@@ -618,22 +649,20 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Sjaakmoes/pokapi.git",
-                "reference": "27cb0281500821b7b2c64150aa779a5a997080c3"
+                "reference": "0501001c6d9381de7d8e8bb4158d481959d683c0"
             },
             "require": {
                 "guzzlehttp/guzzle": "^6.2",
+                "jaspervdm/pogoprotos-php": "^0.1.0",
                 "nicklasw/s2-geometry-library-php": "dev-master",
+                "php": "^7.0",
                 "pogo-php/pogoencrypt-php": "^1.0",
-                "protobuf-php/google-protobuf-proto": "dev-master",
-                "protobuf-php/protobuf": "dev-master"
+                "protobuf-php/google-protobuf-proto": "dev-master"
             },
             "type": "library",
             "autoload": {
                 "psr-0": {
                     "Pokapi\\": "src/"
-                },
-                "psr-4": {
-                    "POGOProtos\\": "POGOProtos/"
                 }
             },
             "authors": [
@@ -642,7 +671,7 @@
                     "email": "freek@kobalt.blue"
                 }
             ],
-            "time": "2016-08-11 22:21:06"
+            "time": "2016-08-15 20:04:01"
         }
     ],
     "packages-dev": [],
