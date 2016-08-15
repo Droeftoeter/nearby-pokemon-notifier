@@ -41,21 +41,29 @@ class Mysql extends Handler
     protected $password;
 
     /**
+     * @var string
+     */
+    protected $table;
+
+    /**
      * Mysql constructor.
      *
      * @param string $host
      * @param string $database
      * @param string $username
      * @param string $password
+     * @param string $table
+     *
      * @param array $filters
      */
-    public function __construct(string $host, string $database, string $username, string $password, array $filters = [])
+    public function __construct(string $host, string $database, string $username, string $password, string $table = 'pokemon', array $filters = [])
     {
         parent::__construct($filters);
         $this->host = $host;
         $this->database = $database;
         $this->username = $username;
         $this->password = $password;
+        $this->table = $table;
     }
 
     /**
@@ -67,7 +75,7 @@ class Mysql extends Handler
     public function handle(Pokemon $pokemon, bool $newEncounter)
     {
         if ($newEncounter) {
-            $query = $this->getPdo()->prepare("INSERT INTO pokemon VALUES(:encounter, :pokemon, :spawnPoint, :ts, :latitude, :longitude, :tth, :pokemonName)");
+            $query = $this->getPdo()->prepare("INSERT IGNORE INTO {$this->table} VALUES(:encounter, :pokemon, :spawnPoint, :ts, :latitude, :longitude, :tth, :pokemonName)");
             $query->bindValue('encounter', $pokemon->getEncounterId(), PDO::PARAM_INT);
             $query->bindValue('pokemon', $pokemon->getPokemonId(), PDO::PARAM_INT);
             $query->bindValue('spawnPoint', $pokemon->getSpawnPoint());
