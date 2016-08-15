@@ -99,11 +99,11 @@ class ForkedNotifier extends BaseNotifier
         }
 
         $this->getLogger()->debug("Splitting workload of ~{Total} into {Chunks} chunks.", [
-            'Total'  => count($this->steps*2),
+            'Total'  => count($this->steps) * 2,
             'Chunks' => count($stepChunks)
         ]);
 
-        if (count($stepChunks[0] * 2) > 100) {
+        if (count($stepChunks[0]) * 2 > 100) {
             $this->getLogger()->alert("Chunk size is more than 100. Considering adding more accounts.");
         }
 
