@@ -30,6 +30,11 @@ class ForkedNotifier extends BaseNotifier
     protected $pids = [];
 
     /**
+     * @var array
+     */
+    protected $paths = [];
+
+    /**
      * ForkedNotifier constructor.
      *
      * @param Provider[] $authProviders
@@ -49,6 +54,32 @@ class ForkedNotifier extends BaseNotifier
         foreach ($deviceInfos as $deviceInfo) {
             $this->addDeviceInfo($deviceInfo);
         }
+    }
+
+    /**
+     * Set the paths
+     *
+     * @param array $paths
+     *
+     * @return ForkedNotifier
+     */
+    public function setPaths(array $paths) : self
+    {
+        $this->paths = $paths;
+        return $this;
+    }
+
+    /**
+     * Add a path
+     *
+     * @param array $path
+     *
+     * @return ForkedNotifier
+     */
+    public function addPath(array $path) : self
+    {
+        $this->paths[] = $path;
+        return $this;
     }
 
     /**
@@ -89,27 +120,14 @@ class ForkedNotifier extends BaseNotifier
             throw new Exception("Not enough devices for all accounts.");
         }
 
-        /* Splits the workload */
-        $stepChunks = array_chunk($this->steps, ceil(count($this->steps) / count($this->authProviders)));
-
-        /* Also walk back to prevent a softban */
-        foreach ($stepChunks as $chunkIndex => $steps) {
-            $reverse = array_slice(array_reverse($steps), 1, count($steps)-2);
-            $stepChunks[$chunkIndex] = array_merge($steps, $reverse);
+        /* Check two */
+        if (count($this->paths) < count($this->authProviders)) {
+            throw new Exception("Not enough paths for all accounts.");
         }
 
-        $this->getLogger()->debug("Splitting workload of ~{Total} into {Chunks} chunks.", [
-            'Total'  => count($this->steps) * 2,
-            'Chunks' => count($stepChunks)
-        ]);
-
-        if (count($stepChunks[0]) * 2 > 100) {
-            $this->getLogger()->alert("Chunk size is more than 100. Considering adding more accounts.");
-        }
-
-        /* Spawn a fork for every authentication provider */
-        foreach ($stepChunks as $chunk => $steps) {
-            $this->pids[] = $this->fork($steps, $this->authProviders[$chunk], $this->deviceInfo[$chunk]);
+        /* Start forks */
+        foreach ($this->authProviders as $index => $provider) {
+            $this->pids[] = $this->fork($this->paths[$index], $provider, $this->deviceInfo[$index]);
             sleep(1);
         }
 
