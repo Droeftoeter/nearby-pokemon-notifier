@@ -55,7 +55,7 @@ class Notifier extends BaseNotifier
         /* Loop */
         foreach ($this->steps as $index => $step) {
             $newPosition = new Position($step[0], $step[1], 12.0);
-            $this->api->setPosition($newPosition);
+            $this->api->setPosition($newPosition->createRandomized());
 
             /* Log */
             $this->getLogger()->debug("Walking {Step} of {Steps}", [
