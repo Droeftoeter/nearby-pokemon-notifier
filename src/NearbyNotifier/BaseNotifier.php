@@ -2,8 +2,8 @@
 namespace NearbyNotifier;
 
 use NearbyNotifier\Handler\Handler;
-use NearbyNotifier\Handler\NullHandler;
-use NearbyNotifier\Handler\RouteHandler;
+use NearbyNotifier\RouteHandler\NullHandler;
+use NearbyNotifier\RouteHandler\RouteHandler;
 use NearbyNotifier\Storage\Process;
 use NearbyNotifier\Storage\Storage;
 use Pokapi\Utility\Geo;
