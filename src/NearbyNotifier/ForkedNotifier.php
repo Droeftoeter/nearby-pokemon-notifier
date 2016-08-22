@@ -171,6 +171,7 @@ class ForkedNotifier extends BaseNotifier
         if (!$pid) {
             $notifier = new Notifier($authProvider, $deviceInfo, $this->latitude, $this->longitude, 1, 0.07);
             $notifier->setStorage($this->getStorage());
+            $notifier->setRouteHandler($this->getRouteHandler()->setIdentifier($pid));
             $notifier->overrideSteps($steps);
             $notifier->setLogger($this->getLogger());
             $notifier->init();

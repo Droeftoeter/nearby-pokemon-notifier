@@ -2,6 +2,8 @@
 namespace NearbyNotifier;
 
 use NearbyNotifier\Handler\Handler;
+use NearbyNotifier\Handler\Null;
+use NearbyNotifier\Handler\RouteHandler;
 use NearbyNotifier\Storage\Process;
 use NearbyNotifier\Storage\Storage;
 use Pokapi\Utility\Geo;
@@ -21,6 +23,11 @@ abstract class BaseNotifier
      * @var Handler[]
      */
     protected $handlers = [];
+
+    /**
+     * @var RouteHandler
+     */
+    protected $routeHandler;
 
     /**
      * @var array
@@ -137,6 +144,19 @@ abstract class BaseNotifier
     }
 
     /**
+     * Set the route handler
+     *
+     * @param RouteHandler $routeHandler
+     *
+     * @return BaseNotifier
+     */
+    public function setRouteHandler(RouteHandler $routeHandler) : self
+    {
+        $this->routeHandler = $routeHandler;
+        return $this;
+    }
+
+    /**
      * Set the step interval in milliseconds
      *
      * @param int $interval
@@ -187,5 +207,20 @@ abstract class BaseNotifier
         }
 
         return $this->storage;
+    }
+
+    /**
+     * Get the route handler
+     *
+     * @return RouteHandler
+     */
+    protected function getRouteHandler() : RouteHandler
+    {
+        if (!$this->routeHandler instanceof RouteHandler)
+        {
+            $this->routeHandler = new Null();
+        }
+
+        return $this->routeHandler;
     }
 }

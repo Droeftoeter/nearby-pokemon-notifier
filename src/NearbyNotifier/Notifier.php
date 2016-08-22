@@ -52,10 +52,17 @@ class Notifier extends BaseNotifier
      */
     public function run()
     {
+        /* Start */
+        $this->getRouteHandler()->start();
+
         /* Loop */
         foreach ($this->steps as $index => $step) {
             $newPosition = new Position($step[0], $step[1], 12.0);
-            $this->api->setPosition($newPosition->createRandomized());
+            $randomized = $newPosition->createRandomized();
+            $this->api->setPosition($randomized);
+
+            /* Route */
+            $this->getRouteHandler()->walkTo($randomized);
 
             /* Log */
             $this->getLogger()->debug("Walking {Step} of {Steps}", [
@@ -69,6 +76,7 @@ class Notifier extends BaseNotifier
 
         /* Clean up storage after each loop */
         $this->getStorage()->cleanup();
+        $this->getRouteHandler()->stop();
     }
 
     /**
