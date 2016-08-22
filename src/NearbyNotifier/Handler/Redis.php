@@ -38,10 +38,12 @@ class Redis extends Handler
      * @param string $prefix
      * @param string $channel
      */
-    public function __construct(Client $predis, array $filters = [], string $prefix = 'encounter', string $channel = null)
+    public function __construct(Client $predis, array $filters = [], string $prefix = null, string $channel = null)
     {
         parent::__construct($filters);
         $this->predis = $predis;
+        $this->channel = $channel;
+        $this->prefix = $prefix;
     }
 
     /**

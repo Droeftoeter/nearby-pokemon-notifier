@@ -180,16 +180,16 @@
         },
         {
             "name": "jaspervdm/pogoprotos-php",
-            "version": "v0.1",
+            "version": "dev-default-packed-fields",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jaspervdm/pogoprotos-php.git",
-                "reference": "851a0530f197a62d3c9745a56f3c161cf2105bd3"
+                "reference": "e6e0bf540a16c8ddef7224300ed84d3ae51f59b4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jaspervdm/pogoprotos-php/zipball/851a0530f197a62d3c9745a56f3c161cf2105bd3",
-                "reference": "851a0530f197a62d3c9745a56f3c161cf2105bd3",
+                "url": "https://api.github.com/repos/jaspervdm/pogoprotos-php/zipball/e6e0bf540a16c8ddef7224300ed84d3ae51f59b4",
+                "reference": "e6e0bf540a16c8ddef7224300ed84d3ae51f59b4",
                 "shasum": ""
             },
             "require": {
@@ -197,7 +197,7 @@
                 "protobuf-php/protobuf": "~0.1"
             },
             "require-dev": {
-                "protobuf-php/protobuf-plugin": "~0.1"
+                "protobuf-php/protobuf-plugin": "dev-master#fea131adaf9a9b6a409917050202ee0bb0c8b101"
             },
             "type": "library",
             "autoload": {
@@ -206,8 +206,31 @@
                 ]
             },
             "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "jaspervdm",
+                    "homepage": "https://github.com/jaspervdm",
+                    "role": "Owner"
+                },
+                {
+                    "name": "DrDelay",
+                    "homepage": "https://github.com/DrDelay",
+                    "role": "Collaborator"
+                }
+            ],
             "description": "Compiled PHP protobufs for pokemon go",
-            "time": "2016-08-14 18:42:41"
+            "homepage": "https://github.com/jaspervdm/pogoprotos-php",
+            "keywords": [
+                "PoGo",
+                "pokemon",
+                "pokemon-go",
+                "protobuf",
+                "protos"
+            ],
+            "time": "2016-08-21 22:16:28"
         },
         {
             "name": "maknz/slack",
@@ -342,12 +365,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/NicklasWallgren/s2-geometry-library-php.git",
-                "reference": "7b70a341ba75290d526335f9874307df2306a540"
+                "reference": "439506917844f812f0740fc2bf2115a9fb4450f4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/NicklasWallgren/s2-geometry-library-php/zipball/7b70a341ba75290d526335f9874307df2306a540",
-                "reference": "7b70a341ba75290d526335f9874307df2306a540",
+                "url": "https://api.github.com/repos/NicklasWallgren/s2-geometry-library-php/zipball/439506917844f812f0740fc2bf2115a9fb4450f4",
+                "reference": "439506917844f812f0740fc2bf2115a9fb4450f4",
                 "shasum": ""
             },
             "require-dev": {
@@ -361,7 +384,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "description": "Fork - Port of s2-geometry-library-java into PHP",
-            "time": "2016-08-02 15:06:32"
+            "time": "2016-08-20 09:18:01"
         },
         {
             "name": "pogo-php/pogoencrypt-php",
@@ -649,11 +672,11 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Sjaakmoes/pokapi.git",
-                "reference": "0501001c6d9381de7d8e8bb4158d481959d683c0"
+                "reference": "07320179f03490dea99b9d002626ac4ff96b32a4"
             },
             "require": {
                 "guzzlehttp/guzzle": "^6.2",
-                "jaspervdm/pogoprotos-php": "^0.1.0",
+                "jaspervdm/pogoprotos-php": "dev-default-packed-fields",
                 "nicklasw/s2-geometry-library-php": "dev-master",
                 "php": "^7.0",
                 "pogo-php/pogoencrypt-php": "^1.0",
@@ -671,7 +694,7 @@
                     "email": "freek@kobalt.blue"
                 }
             ],
-            "time": "2016-08-15 20:04:01"
+            "time": "2016-08-22 08:00:05"
         }
     ],
     "packages-dev": [],
