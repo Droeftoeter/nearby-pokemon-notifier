@@ -170,7 +170,7 @@ class ForkedNotifier extends BaseNotifier
         $pid = pcntl_fork();
         if (!$pid) {
             $routeHandler = clone $this->getRouteHandler();
-            $routeHandler->setIdentifier($pid);
+            $routeHandler->setIdentifier(getmypid());
 
             $notifier = new Notifier($authProvider, $deviceInfo, $this->latitude, $this->longitude, 1, 0.07);
             $notifier->setStorage($this->getStorage());
