@@ -1,5 +1,5 @@
 <?php
-namespace NearbyNotifier\Handler;
+namespace NearbyNotifier\RouteHandler;
 
 use NearbyNotifier\Entity\Pokemon;
 use NearbyNotifier\Filter\Filter;

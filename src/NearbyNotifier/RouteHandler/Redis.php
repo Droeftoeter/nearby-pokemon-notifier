@@ -1,5 +1,5 @@
 <?php
-namespace NearbyNotifier\Handler;
+namespace NearbyNotifier\RouteHandler;
 
 use Pokapi\Request\Position;
 use Predis\Client;
