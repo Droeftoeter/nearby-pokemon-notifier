@@ -51,14 +51,14 @@ class Redis extends RouteHandler
      */
     public function walkTo(Position $position)
     {
-        $this->predis->publish($this->channel, [
+        $this->predis->publish($this->channel, json_encode([
             'identifier'  => $this->identifier,
             'operation'   => 'walk',
             'coordinates' => [
                 'lat'     => $position->getLatitude(),
                 'lng'     => $position->getLongitude()
             ]
-        ]);
+        ]));
     }
 
     /**
@@ -66,10 +66,10 @@ class Redis extends RouteHandler
      */
     public function start()
     {
-        $this->predis->publish($this->channel, [
+        $this->predis->publish($this->channel, json_encode([
             'identifier'  => $this->identifier,
             'operation'   => 'start'
-        ]);
+        ]));
     }
 
     /**
@@ -77,9 +77,9 @@ class Redis extends RouteHandler
      */
     public function stop()
     {
-        $this->predis->publish($this->channel, [
+        $this->predis->publish($this->channel, json_encode([
             'identifier'  => $this->identifier,
             'operation'   => 'stop'
-        ]);
+        ]));
     }
 }
