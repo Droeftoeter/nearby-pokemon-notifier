@@ -2,7 +2,7 @@
 namespace NearbyNotifier;
 
 use NearbyNotifier\Handler\Handler;
-use NearbyNotifier\Handler\Null;
+use NearbyNotifier\Handler\NullHandler;
 use NearbyNotifier\Handler\RouteHandler;
 use NearbyNotifier\Storage\Process;
 use NearbyNotifier\Storage\Storage;
@@ -218,7 +218,7 @@ abstract class BaseNotifier
     {
         if (!$this->routeHandler instanceof RouteHandler)
         {
-            $this->routeHandler = new Null();
+            $this->routeHandler = new NullHandler();
         }
 
         return $this->routeHandler;

@@ -4,12 +4,12 @@ namespace NearbyNotifier\Handler;
 use Pokapi\Request\Position;
 
 /**
- * Class Null
+ * Class NullHandler
  *
  * @package NearbyNotifier\RouteHandler
  * @author Freek Post <freek@kobalt.blue>
  */
-class Null extends RouteHandler
+class NullHandler extends RouteHandler
 {
 
     /**
