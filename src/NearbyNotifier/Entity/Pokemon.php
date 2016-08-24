@@ -75,8 +75,6 @@ class Pokemon implements JsonSerializable
         $expires = new DateTime();
         $expires->add(new DateInterval('PT' . floor($expiry / 1000) . 'S'));
         $this->expiry = $expires;
-
-        print_r($this);
     }
 
     /**
