@@ -159,34 +159,31 @@ class Notifier extends BaseNotifier
      */
     protected function addEncounter(WildPokemon $wildPokemon)
     {
-        if ($wildPokemon->getTimeTillHiddenMs() > 0 && $wildPokemon->getTimeTillHiddenMs() < 3600000) {
+        /* Create entity */
+        $pokemon = new Pokemon(
+            $wildPokemon->getEncounterId(),
+            $wildPokemon->getLatitude(),
+            $wildPokemon->getLongitude(),
+            $wildPokemon->getPokemonData()->getPokemonId()->value(),
+            $wildPokemon->getTimeTillHiddenMs(),
+            $wildPokemon->getSpawnPointId(),
+            $wildPokemon->getLastModifiedTimestampMs()
+        );
 
-            /* Create entity */
-            $pokemon = new Pokemon(
-                $wildPokemon->getEncounterId(),
-                $wildPokemon->getLatitude(),
-                $wildPokemon->getLongitude(),
-                $wildPokemon->getPokemonData()->getPokemonId()->value(),
-                $wildPokemon->getTimeTillHiddenMs(),
-                $wildPokemon->getSpawnPointId(),
-                $wildPokemon->getLastModifiedTimestampMs()
-            );
+        $isNew = $this->getStorage()->isNew($pokemon);
 
-            $isNew = $this->getStorage()->isNew($pokemon);
+        /* Log */
+        $this->getLogger()->info("{State} encounter with {Name} found at {Latitude}, {Longitude}. Expires in {Expiry} minutes.", [
+            'State' => $isNew ? 'New' : 'Existing',
+            'Name' => $pokemon->getName(),
+            'Latitude'  => $pokemon->getLatitude(),
+            'Longitude' => $pokemon->getLongitude(),
+            'Expiry' => $pokemon->getExpiryInMinutes()
+        ]);
 
-            /* Log */
-            $this->getLogger()->info("{State} encounter with {Name} found at {Latitude}, {Longitude}. Expires in {Expiry} minutes.", [
-                'State' => $isNew ? 'New' : 'Existing',
-                'Name' => $pokemon->getName(),
-                'Latitude'  => $pokemon->getLatitude(),
-                'Longitude' => $pokemon->getLongitude(),
-                'Expiry' => $pokemon->getExpiryInMinutes()
-            ]);
-
-            /* Notify listeners */
-            foreach ($this->handlers as $handler) {
-                $handler->notify($pokemon, $isNew);
-            }
+        /* Notify listeners */
+        foreach ($this->handlers as $handler) {
+            $handler->notify($pokemon, $isNew);
         }
 
         $this->encounters++;
