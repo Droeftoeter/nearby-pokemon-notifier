@@ -1,9 +1,11 @@
 <?php
 namespace NearbyNotifier;
 
-use Pokapi\Authentication\Provider;
+use Pokapi\Authentication;
+use Pokapi\Hashing;
 use Pokapi\Request\DeviceInfo;
 use Exception;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class ForkedNotifier
@@ -15,7 +17,7 @@ class ForkedNotifier extends BaseNotifier
 {
 
     /**
-     * @var Provider[]
+     * @var Authentication\Provider[]
      */
     protected $authProviders;
 
@@ -23,6 +25,11 @@ class ForkedNotifier extends BaseNotifier
      * @var DeviceInfo[]
      */
     protected $deviceInfo;
+
+    /**
+     * @var Hashing\Provider
+     */
+    protected $hashingProvider;
 
     /**
      * @var int[]
@@ -37,16 +44,26 @@ class ForkedNotifier extends BaseNotifier
     /**
      * ForkedNotifier constructor.
      *
-     * @param Provider[] $authProviders
-     * @param DeviceInfo[] $deviceInfos
-     * @param float $latitude
-     * @param float $longitude
-     * @param int $steps
-     * @param float $radius
+     * @param Hashing\Provider          $hashingProvider
+     * @param Authentication\Provider[] $authProviders
+     * @param DeviceInfo[]              $deviceInfos
+     * @param float                     $latitude
+     * @param float                     $longitude
+     * @param int                       $steps
+     * @param float                     $radius
+     * @param LoggerInterface|null      $logger
      */
-    public function __construct(array $authProviders, array $deviceInfos, float $latitude, float $longitude, int $steps = 5, float $radius = 0.04)
-    {
-        parent::__construct($latitude, $longitude, $steps, $radius);
+    public function __construct(
+        Hashing\Provider $hashingProvider,
+        array $authProviders,
+        array $deviceInfos,
+        float $latitude,
+        float $longitude,
+        int $steps = 5,
+        float $radius = 0.04,
+        LoggerInterface $logger = null
+    ) {
+        parent::__construct($latitude, $longitude, $steps, $radius, $logger);
         foreach ($authProviders as $authProvider) {
             $this->addAuthProvider($authProvider);
         }
@@ -85,11 +102,11 @@ class ForkedNotifier extends BaseNotifier
     /**
      * Add an authentication provider.
      *
-     * @param Provider $authProvider
+     * @param Authentication\Provider $authProvider
      *
      * @return ForkedNotifier
      */
-    public function addAuthProvider(Provider $authProvider) : self
+    public function addAuthProvider(Authentication\Provider $authProvider) : self
     {
         $this->authProviders[] = $authProvider;
         return $this;
@@ -159,20 +176,20 @@ class ForkedNotifier extends BaseNotifier
     /**
      * Fork a notifier
      *
-     * @param array $steps
-     * @param Provider $authProvider
-     * @param DeviceInfo $deviceInfo
+     * @param array                   $steps
+     * @param Authentication\Provider $authProvider
+     * @param DeviceInfo              $deviceInfo
      *
      * @return int
      */
-    protected function fork(array $steps, Provider $authProvider, DeviceInfo $deviceInfo) : int
+    protected function fork(array $steps, Authentication\Provider $authProvider, DeviceInfo $deviceInfo) : int
     {
         $pid = pcntl_fork();
         if (!$pid) {
             $routeHandler = clone $this->getRouteHandler();
             $routeHandler->setIdentifier(getmypid());
 
-            $notifier = new Notifier($authProvider, $deviceInfo, $this->latitude, $this->longitude, 1, 0.07);
+            $notifier = new Notifier($this->hashingProvider, $authProvider, $deviceInfo, $this->latitude, $this->longitude, 1, 0.07);
             $notifier->setStorage($this->getStorage());
             $notifier->setRouteHandler($routeHandler);
             $notifier->overrideSteps($steps);

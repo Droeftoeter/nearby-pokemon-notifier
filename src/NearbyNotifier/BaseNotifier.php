@@ -67,16 +67,21 @@ abstract class BaseNotifier
     /**
      * BaseNotifier constructor.
      *
-     * @param float $latitude
-     * @param float $longitude
-     * @param int $steps
-     * @param float $radius
+     * @param float                $latitude
+     * @param float                $longitude
+     * @param int                  $steps
+     * @param float                $radius
+     * @param LoggerInterface|null $logger
      */
-    public function __construct(float $latitude, float $longitude, int $steps = 5, float $radius = 0.04)
+    public function __construct(float $latitude, float $longitude, int $steps = 5, float $radius = 0.04, LoggerInterface $logger = null)
     {
         $this->latitude = $latitude;
         $this->longitude = $longitude;
         $this->steps = Geo::generateSteps($this->latitude, $this->longitude, $steps, $radius);
+
+        if ($logger !== null) {
+            $this->logger = $logger;
+        }
     }
 
     /**

@@ -5,11 +5,14 @@ use POGOProtos\Map\Pokemon\WildPokemon;
 use NearbyNotifier\Entity\Pokemon;
 use POGOProtos\Networking\Responses\GetMapObjectsResponse;
 use Pokapi\API;
-use Pokapi\Authentication\Provider;
+use Pokapi\Authentication;
+use Pokapi\Hashing;
 use Pokapi\Exception\Exception;
 use Pokapi\Exception\NoResponse;
 use Pokapi\Request\DeviceInfo;
 use Pokapi\Request\Position;
+use Pokapi\Version\Latest;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class Notifier
@@ -33,18 +36,29 @@ class Notifier extends BaseNotifier
     /**
      * Notifier constructor.
      *
-     * @param Provider $authProvider
-     * @param DeviceInfo $deviceInfo
-     * @param float $latitude
-     * @param float $longitude
-     * @param int $steps
-     * @param float $radius
+     * @param Hashing\Provider        $hashingProvider
+     * @param Authentication\Provider $authProvider
+     * @param DeviceInfo              $deviceInfo
+     * @param float                   $latitude
+     * @param float                   $longitude
+     * @param int                     $steps
+     * @param float                   $radius
+     * @param LoggerInterface|null    $logger
      */
-    public function __construct(Provider $authProvider, DeviceInfo $deviceInfo, float $latitude, float $longitude, int $steps = 5, float $radius = 0.04)
-    {
-        parent::__construct($latitude, $longitude, $steps, $radius);
+    public function __construct(
+        Hashing\Provider $hashingProvider,
+        Authentication\Provider $authProvider,
+        DeviceInfo $deviceInfo,
+        float $latitude,
+        float $longitude,
+        int $steps = 5,
+        float $radius = 0.04,
+        LoggerInterface $logger = null
+    ) {
+        parent::__construct($latitude, $longitude, $steps, $radius, $logger);
         $position = new Position($latitude, $longitude, 12.0);
-        $this->api = new API($authProvider, $position, $deviceInfo);
+        $version  = new Latest();
+        $this->api = new API($version, $authProvider, $position, $deviceInfo, $hashingProvider, $logger);
     }
 
     /**

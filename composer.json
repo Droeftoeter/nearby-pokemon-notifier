@@ -7,17 +7,17 @@
         }
     ],
     "minimum-stability": "dev",
-    "prefer-stable" : true,
+    "prefer-stable" : false,
     "require": {
-        "php": ">=7.0.0",
+        "php": ">=7.1.0",
         "maknz/slack": "^1.7",
-        "sjaakmoes/pokapi": "dev-master",
+        "sjaakmoes/pokapi": "v2.0.x-dev",
         "monolog/monolog": "^1.21",
         "predis/predis": "^1.1"
     },
     "repositories": [
         {
-            "url": "https://github.com/Sjaakmoes/pokapi.git",
+            "url": "https://github.com/Droeftoeter/pokapi.git",
             "type": "git"
         }
     ],
