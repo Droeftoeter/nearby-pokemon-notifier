@@ -71,6 +71,8 @@ class ForkedNotifier extends BaseNotifier
         foreach ($deviceInfos as $deviceInfo) {
             $this->addDeviceInfo($deviceInfo);
         }
+
+        $this->hashingProvider = $hashingProvider;
     }
 
     /**
@@ -144,7 +146,7 @@ class ForkedNotifier extends BaseNotifier
 
         /* Start forks */
         foreach ($this->authProviders as $index => $provider) {
-            $this->pids[] = $this->fork($this->paths[$index], $provider, $this->deviceInfo[$index]);
+            $this->pids[] = $this->fork($this->paths[$index], $provider, $this->deviceInfo[$index], $this->hashingProvider);
             sleep(1);
         }
 
@@ -179,17 +181,18 @@ class ForkedNotifier extends BaseNotifier
      * @param array                   $steps
      * @param Authentication\Provider $authProvider
      * @param DeviceInfo              $deviceInfo
+     * @param Hashing\Provider|null   $hashingProvider
      *
      * @return int
      */
-    protected function fork(array $steps, Authentication\Provider $authProvider, DeviceInfo $deviceInfo) : int
+    protected function fork(array $steps, Authentication\Provider $authProvider, DeviceInfo $deviceInfo, Hashing\Provider $hashingProvider = null) : int
     {
         $pid = pcntl_fork();
         if (!$pid) {
             $routeHandler = clone $this->getRouteHandler();
             $routeHandler->setIdentifier(getmypid());
 
-            $notifier = new Notifier($this->hashingProvider, $authProvider, $deviceInfo, $this->latitude, $this->longitude, 1, 0.07);
+            $notifier = new Notifier($hashingProvider, $authProvider, $deviceInfo, $this->latitude, $this->longitude, 1, 0.07);
             $notifier->setStorage($this->getStorage());
             $notifier->setRouteHandler($routeHandler);
             $notifier->overrideSteps($steps);

@@ -12,6 +12,7 @@ use Pokapi\Exception\NoResponse;
 use Pokapi\Request\DeviceInfo;
 use Pokapi\Request\Position;
 use Pokapi\Version\Latest;
+use Protobuf\Collection;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -118,14 +119,18 @@ class Notifier extends BaseNotifier
     public function handleResponse(GetMapObjectsResponse $response)
     {
         /** @var \POGOProtos\Map\MapCell $mapCell */
-        foreach ($response->getMapCellsList() as $mapCell) {
-            if ($mapCell->getWildPokemonsList() && $mapCell->getWildPokemonsList()->count() > 0) {
-                $wildPokemons = $mapCell->getWildPokemonsList();
+        if ($response->getMapCellsList() instanceof Collection) {
+            foreach ($response->getMapCellsList() as $mapCell) {
+                if ($mapCell->getWildPokemonsList() && $mapCell->getWildPokemonsList()->count() > 0) {
+                    $wildPokemons = $mapCell->getWildPokemonsList();
 
-                foreach ($wildPokemons as $wildPokemon) {
-                    $this->addEncounter($wildPokemon);
+                    foreach ($wildPokemons as $wildPokemon) {
+                        $this->addEncounter($wildPokemon);
+                    }
                 }
             }
+        } else {
+            $this->getLogger()->warning("Received empty MapCellsList");
         }
     }
 
