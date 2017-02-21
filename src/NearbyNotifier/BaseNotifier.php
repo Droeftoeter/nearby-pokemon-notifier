@@ -62,7 +62,7 @@ abstract class BaseNotifier
     /**
      * @var int
      */
-    protected $stepInterval = 12000 * 1000; // 12 seconds.
+    protected $stepInterval = 16000 * 1000; // 16 seconds.
 
     /**
      * BaseNotifier constructor.
