@@ -1,6 +1,7 @@
 <?php
 namespace NearbyNotifier;
 
+use NearbyNotifier\Captcha\Handler;
 use Pokapi\Authentication;
 use Pokapi\Hashing;
 use Pokapi\Request\DeviceInfo;
@@ -32,6 +33,11 @@ class ForkedNotifier extends BaseNotifier
     protected $hashingProvider;
 
     /**
+     * @var Handler
+     */
+    protected $captchaHandler;
+
+    /**
      * @var int[]
      */
     protected $pids = [];
@@ -52,6 +58,7 @@ class ForkedNotifier extends BaseNotifier
      * @param int                       $steps
      * @param float                     $radius
      * @param LoggerInterface|null      $logger
+     * @param Handler|null              $captchaHandler
      */
     public function __construct(
         Hashing\Provider $hashingProvider,
@@ -61,7 +68,8 @@ class ForkedNotifier extends BaseNotifier
         float $longitude,
         int $steps = 5,
         float $radius = 0.04,
-        LoggerInterface $logger = null
+        LoggerInterface $logger = null,
+        Handler $captchaHandler = null
     ) {
         parent::__construct($latitude, $longitude, $steps, $radius, $logger);
         foreach ($authProviders as $authProvider) {
@@ -73,6 +81,7 @@ class ForkedNotifier extends BaseNotifier
         }
 
         $this->hashingProvider = $hashingProvider;
+        $this->captchaHandler  = $captchaHandler;
     }
 
     /**
@@ -146,7 +155,7 @@ class ForkedNotifier extends BaseNotifier
 
         /* Start forks */
         foreach ($this->authProviders as $index => $provider) {
-            $this->pids[] = $this->fork($this->paths[$index], $provider, $this->deviceInfo[$index], $this->hashingProvider);
+            $this->pids[] = $this->fork($this->paths[$index], $provider, $this->deviceInfo[$index], $this->hashingProvider, $this->captchaHandler);
             sleep(1);
         }
 
@@ -182,17 +191,18 @@ class ForkedNotifier extends BaseNotifier
      * @param Authentication\Provider $authProvider
      * @param DeviceInfo              $deviceInfo
      * @param Hashing\Provider|null   $hashingProvider
+     * @param Handler|null            $captchaHandler
      *
      * @return int
      */
-    protected function fork(array $steps, Authentication\Provider $authProvider, DeviceInfo $deviceInfo, Hashing\Provider $hashingProvider = null) : int
+    protected function fork(array $steps, Authentication\Provider $authProvider, DeviceInfo $deviceInfo, Hashing\Provider $hashingProvider = null, Handler $captchaHandler = null) : int
     {
         $pid = pcntl_fork();
         if (!$pid) {
             $routeHandler = clone $this->getRouteHandler();
             $routeHandler->setIdentifier(getmypid());
 
-            $notifier = new Notifier($hashingProvider, $authProvider, $deviceInfo, $this->latitude, $this->longitude, 1, 0.07);
+            $notifier = new Notifier($hashingProvider, $authProvider, $deviceInfo, $this->latitude, $this->longitude, 1, 0.07, null, $captchaHandler);
             $notifier->setStorage($this->getStorage());
             $notifier->setRouteHandler($routeHandler);
             $notifier->overrideSteps($steps);
