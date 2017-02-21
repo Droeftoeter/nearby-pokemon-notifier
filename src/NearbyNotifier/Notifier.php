@@ -1,6 +1,8 @@
 <?php
 namespace NearbyNotifier;
 
+use NearbyNotifier\Captcha\Handler;
+use NearbyNotifier\Exception\FlaggedAccountException;
 use POGOProtos\Map\Pokemon\WildPokemon;
 use NearbyNotifier\Entity\Pokemon;
 use POGOProtos\Networking\Responses\GetMapObjectsResponse;
@@ -35,6 +37,11 @@ class Notifier extends BaseNotifier
     protected $encounters = 0;
 
     /**
+     * @var Handler|null
+     */
+    protected $captcha;
+
+    /**
      * Notifier constructor.
      *
      * @param Hashing\Provider        $hashingProvider
@@ -45,6 +52,7 @@ class Notifier extends BaseNotifier
      * @param int                     $steps
      * @param float                   $radius
      * @param LoggerInterface|null    $logger
+     * @param Handler|null            $captchaHandler
      */
     public function __construct(
         Hashing\Provider $hashingProvider,
@@ -54,12 +62,15 @@ class Notifier extends BaseNotifier
         float $longitude,
         int $steps = 5,
         float $radius = 0.04,
-        LoggerInterface $logger = null
+        LoggerInterface $logger = null,
+        Handler $captchaHandler = null
     ) {
         parent::__construct($latitude, $longitude, $steps, $radius, $logger);
         $position = new Position($latitude, $longitude, 12.0);
         $version  = new Latest();
         $this->api = new API($version, $authProvider, $position, $deviceInfo, $hashingProvider, $logger);
+
+        $this->captcha = $captchaHandler;
     }
 
     /**
@@ -69,6 +80,9 @@ class Notifier extends BaseNotifier
     {
         /* Start */
         $this->getRouteHandler()->start();
+
+        /* Captcha */
+        $this->checkChallenge();
 
         /* Loop */
         foreach ($this->steps as $index => $step) {
@@ -169,6 +183,33 @@ class Notifier extends BaseNotifier
         }
 
         return true;
+    }
+
+    /**
+     * Check if account is flagged
+     *
+     * @throws FlaggedAccountException
+     */
+    protected function checkChallenge() : bool
+    {
+        $challenge    = $this->api->checkChallenge();
+        $challengeUrl = trim($challenge->getChallengeUrl());
+
+        if ($challenge->getShowChallenge() || !empty($challengeUrl)) {
+            $this->getLogger()->warning("Account is flagged for CAPTCHA.");
+            if ($this->captcha === null) {
+                throw new FlaggedAccountException("Account is flagged, and no CAPTCHA solvers are set. Challenge URL: " . $challengeUrl);
+            }
+
+            $this->getLogger()->debug("Sending challenge {Challenge} to solver.", array('Challenge' => $challengeUrl));
+            $token = $this->captcha->solve($challengeUrl);
+            $this->getLogger()->debug("Received solution token {Token}", array('Token' => $token));
+            $this->api->verifyChallenge($token);
+
+            return true;
+        }
+
+        return false;
     }
 
     /**

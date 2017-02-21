@@ -689,13 +689,13 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Droeftoeter/pokapi.git",
-                "reference": "e4fd98121f3d7ce09745ab3b351cc49829964e8f"
+                "reference": "393a0fc2e6f6cf55eaf6470524fd4ccca11eff9e"
             },
             "require": {
                 "guzzlehttp/guzzle": "^6.2",
                 "jaspervdm/pogoprotos-php": "dev-master",
                 "nicklasw/s2-geometry-library-php": "dev-master",
-                "php": "^7.0",
+                "php": "^7.1",
                 "pogo-php/pogoencrypt-php": "^1.0",
                 "protobuf-php/google-protobuf-proto": "dev-master",
                 "psr/log": "^1.0"
@@ -712,7 +712,7 @@
                     "email": "freek@kobalt.blue"
                 }
             ],
-            "time": "2017-02-18 14:50:41"
+            "time": "2017-02-19 15:22:55"
         }
     ],
     "packages-dev": [],
