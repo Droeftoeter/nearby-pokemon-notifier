@@ -1,13 +1,14 @@
 <?php
 namespace NearbyNotifier;
 
-use NearbyNotifier\Captcha\Handler;
 use NearbyNotifier\Exception\FlaggedAccountException;
 use POGOProtos\Map\Pokemon\WildPokemon;
 use NearbyNotifier\Entity\Pokemon;
 use POGOProtos\Networking\Responses\GetMapObjectsResponse;
 use Pokapi\API;
 use Pokapi\Authentication;
+use Pokapi\Captcha\Solver;
+use Pokapi\Exception\FailedCaptchaException;
 use Pokapi\Hashing;
 use Pokapi\Exception\Exception;
 use Pokapi\Exception\NoResponse;
@@ -37,11 +38,6 @@ class Notifier extends BaseNotifier
     protected $encounters = 0;
 
     /**
-     * @var Handler|null
-     */
-    protected $captcha;
-
-    /**
      * Notifier constructor.
      *
      * @param Hashing\Provider        $hashingProvider
@@ -52,7 +48,7 @@ class Notifier extends BaseNotifier
      * @param int                     $steps
      * @param float                   $radius
      * @param LoggerInterface|null    $logger
-     * @param Handler|null            $captchaHandler
+     * @param Solver|null             $captchaHandler
      */
     public function __construct(
         Hashing\Provider $hashingProvider,
@@ -63,14 +59,12 @@ class Notifier extends BaseNotifier
         int $steps = 5,
         float $radius = 0.04,
         LoggerInterface $logger = null,
-        Handler $captchaHandler = null
+        Solver $captchaHandler = null
     ) {
         parent::__construct($latitude, $longitude, $steps, $radius, $logger);
         $position = new Position($latitude, $longitude, 12.0);
         $version  = new Latest();
-        $this->api = new API($version, $authProvider, $position, $deviceInfo, $hashingProvider, $logger);
-
-        $this->captcha = $captchaHandler;
+        $this->api = new API($version, $authProvider, $position, $deviceInfo, $hashingProvider, $logger, $captchaHandler);
     }
 
     /**
@@ -83,6 +77,11 @@ class Notifier extends BaseNotifier
 
         /* Captcha */
         $this->checkChallenge();
+
+        /* Player data, this will increase boot-up time by 8 seconds +/- */
+        usleep($this->requestInterval);
+        $this->api->getPlayerData(); // We don't do anything with this data.
+        usleep($this->requestInterval);
 
         /* Loop */
         foreach ($this->steps as $index => $step) {
@@ -178,7 +177,7 @@ class Notifier extends BaseNotifier
             $this->api->initialize();
         } catch(NoResponse $e) {
             $this->getLogger()->error('Failed initialization, retrying...');
-            sleep(5);
+            usleep($this->requestInterval);
             return $this->init();
         }
 
@@ -192,24 +191,24 @@ class Notifier extends BaseNotifier
      */
     protected function checkChallenge() : bool
     {
-        $challenge    = $this->api->checkChallenge();
-        $challengeUrl = trim($challenge->getChallengeUrl());
+        try {
+            $hasChallenge = $this->api->checkChallenge();
+        } catch (FailedCaptchaException $e) {
+            throw new FlaggedAccountException("Account is flagged, and CAPTCHA-resolver failed to resolve CAPTCHA.");
+        }
 
-        if ($challenge->getShowChallenge() || !empty($challengeUrl)) {
-            $this->getLogger()->warning("Account is flagged for CAPTCHA.");
-            if ($this->captcha === null) {
-                throw new FlaggedAccountException("Account is flagged, and no CAPTCHA solvers are set. Challenge URL: " . $challengeUrl);
-            }
-
-            $this->getLogger()->debug("Sending challenge {Challenge} to solver.", array('Challenge' => $challengeUrl));
-            $token = $this->captcha->solve($challengeUrl);
-            $this->getLogger()->debug("Received solution token {Token}", array('Token' => $token));
-            $this->api->verifyChallenge($token);
-
+        /* No challenge! Hooray! */
+        if ($hasChallenge === false) {
             return true;
         }
 
-        return false;
+        /* There was a challenge :( But it is resolved! */
+        if ($hasChallenge === true) {
+            $this->getLogger()->alert("Account was flagged, but CAPTCHA is resolved succesfully.");
+            return true;
+        }
+
+        throw new FlaggedAccountException("Account is flagged, and no CAPTCHA-resolvers are available.");
     }
 
     /**

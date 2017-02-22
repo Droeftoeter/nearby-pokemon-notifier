@@ -1,9 +1,10 @@
 <?php
 namespace NearbyNotifier\Captcha;
 
+use Pokapi\Captcha\Solver;
 use Predis\Client;
 
-class Redis implements Handler
+class Redis implements Solver
 {
 
     /**

@@ -65,6 +65,11 @@ abstract class BaseNotifier
     protected $stepInterval = 16000 * 1000; // 16 seconds.
 
     /**
+     * @var int
+     */
+    protected $requestInterval = 4000 * 1000; //  4 seconds.
+
+    /**
      * BaseNotifier constructor.
      *
      * @param float                $latitude
