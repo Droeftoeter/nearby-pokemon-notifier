@@ -75,9 +75,6 @@ class Notifier extends BaseNotifier
         /* Start */
         $this->getRouteHandler()->start();
 
-        /* Captcha */
-        $this->checkChallenge();
-
         /* Player data, this will increase boot-up time by 8 seconds +/- */
         usleep($this->requestInterval);
         $this->api->getPlayerData(); // We don't do anything with this data.
@@ -182,33 +179,6 @@ class Notifier extends BaseNotifier
         }
 
         return true;
-    }
-
-    /**
-     * Check if account is flagged
-     *
-     * @throws FlaggedAccountException
-     */
-    protected function checkChallenge() : bool
-    {
-        try {
-            $hasChallenge = $this->api->checkChallenge();
-        } catch (FailedCaptchaException $e) {
-            throw new FlaggedAccountException("Account is flagged, and CAPTCHA-resolver failed to resolve CAPTCHA.");
-        }
-
-        /* No challenge! Hooray! */
-        if ($hasChallenge === false) {
-            return true;
-        }
-
-        /* There was a challenge :( But it is resolved! */
-        if ($hasChallenge === true) {
-            $this->getLogger()->alert("Account was flagged, but CAPTCHA is resolved succesfully.");
-            return true;
-        }
-
-        throw new FlaggedAccountException("Account is flagged, and no CAPTCHA-resolvers are available.");
     }
 
     /**

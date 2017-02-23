@@ -202,7 +202,7 @@ class ForkedNotifier extends BaseNotifier
             $routeHandler = clone $this->getRouteHandler();
             $routeHandler->setIdentifier(getmypid());
 
-            $notifier = new Notifier($hashingProvider, $authProvider, $deviceInfo, $this->latitude, $this->longitude, 1, 0.07, null, $captchaHandler);
+            $notifier = new Notifier($hashingProvider, $authProvider, $deviceInfo, $this->latitude, $this->longitude, 1, 0.07, $this->getLogger(), $captchaHandler);
             $notifier->setStorage($this->getStorage());
             $notifier->setRouteHandler($routeHandler);
             $notifier->overrideSteps($steps);
