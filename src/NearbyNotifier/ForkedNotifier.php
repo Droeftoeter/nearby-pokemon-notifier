@@ -1,12 +1,12 @@
 <?php
 namespace NearbyNotifier;
 
-use NearbyNotifier\Captcha\Handler;
 use Pokapi\Authentication;
 use Pokapi\Hashing;
+use Pokapi\Captcha\Solver;
 use Pokapi\Request\DeviceInfo;
-use Exception;
 use Psr\Log\LoggerInterface;
+use Exception;
 
 /**
  * Class ForkedNotifier
@@ -33,7 +33,7 @@ class ForkedNotifier extends BaseNotifier
     protected $hashingProvider;
 
     /**
-     * @var Handler
+     * @var Solver
      */
     protected $captchaHandler;
 
@@ -58,7 +58,7 @@ class ForkedNotifier extends BaseNotifier
      * @param int                       $steps
      * @param float                     $radius
      * @param LoggerInterface|null      $logger
-     * @param Handler|null              $captchaHandler
+     * @param Solver|null               $captchaHandler
      */
     public function __construct(
         Hashing\Provider $hashingProvider,
@@ -69,7 +69,7 @@ class ForkedNotifier extends BaseNotifier
         int $steps = 5,
         float $radius = 0.04,
         LoggerInterface $logger = null,
-        Handler $captchaHandler = null
+        Solver $captchaHandler = null
     ) {
         parent::__construct($latitude, $longitude, $steps, $radius, $logger);
         foreach ($authProviders as $authProvider) {
@@ -191,11 +191,11 @@ class ForkedNotifier extends BaseNotifier
      * @param Authentication\Provider $authProvider
      * @param DeviceInfo              $deviceInfo
      * @param Hashing\Provider|null   $hashingProvider
-     * @param Handler|null            $captchaHandler
+     * @param Solver|null             $captchaHandler
      *
      * @return int
      */
-    protected function fork(array $steps, Authentication\Provider $authProvider, DeviceInfo $deviceInfo, Hashing\Provider $hashingProvider = null, Handler $captchaHandler = null) : int
+    protected function fork(array $steps, Authentication\Provider $authProvider, DeviceInfo $deviceInfo, Hashing\Provider $hashingProvider = null, Solver $captchaHandler = null) : int
     {
         $pid = pcntl_fork();
         if (!$pid) {
